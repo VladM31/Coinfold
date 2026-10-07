@@ -34,10 +34,9 @@ import com.vm.coinfold.app.feature.expenses.domain.viewmodels.ExpensesState
 import com.vm.coinfold.app.feature.expenses.domain.viewmodels.ExpensesViewModel
 import com.vm.coinfold.app.feature.expenses.ui.components.AddExpenseSheet
 import com.vm.coinfold.app.feature.expenses.ui.components.CategoryFormSheet
-import com.vm.coinfold.app.feature.expenses.ui.components.CategoryRow
-import com.vm.coinfold.app.feature.expenses.ui.components.GRID_COLUMNS
-import com.vm.coinfold.app.shared.ui.components.PeriodSwitcher
+import com.vm.coinfold.app.feature.expenses.ui.components.CategoryGrid
 import com.vm.coinfold.app.feature.expenses.ui.components.SummaryRing
+import com.vm.coinfold.app.shared.ui.components.PeriodSwitcher
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -79,11 +78,15 @@ private fun ExpensesContent(state: ExpensesState, onIntent: (ExpensesIntent) -> 
                 }
             }
             state.summary?.let { summary -> item { SummaryRing(summary) } }
-            // Categories as a grid of circles, the last cell is the "add" button.
-            val cells = state.summary?.perCategory.orEmpty()
-            val rows = (cells.map<CategorySpend, CategorySpend?> { it } + null).chunked(GRID_COLUMNS)
-            items(rows.size) { index ->
-                CategoryRow(rows[index], onIntent)
+            // Categories as a draggable grid of circles; the last cell is the "add" button.
+            item {
+                CategoryGrid(
+                    items = state.summary?.perCategory.orEmpty(),
+                    onCategoryClick = { onIntent(ExpensesIntent.CategoryClicked(it)) },
+                    onCategoryEdit = { onIntent(ExpensesIntent.CategoryLongClicked(it)) },
+                    onAddClick = { onIntent(ExpensesIntent.AddCategoryClicked) },
+                    onReorder = { onIntent(ExpensesIntent.ReorderCategories(it)) },
+                )
             }
         }
     }
@@ -97,23 +100,16 @@ private fun ExpensesDialogs(state: ExpensesState, onIntent: (ExpensesIntent) -> 
         null -> Unit
         ExpensesDialog.AddCategory -> CategoryFormSheet(
             category = null,
-            canMoveUp = false,
-            canMoveDown = false,
             onSave = { name, color, icon -> onIntent(ExpensesIntent.SaveCategory(null, name, color, icon)) },
-            onMove = {},
             onDelete = null,
             onDismiss = dismiss,
         )
         is ExpensesDialog.EditCategory -> {
-            val index = state.categories.indexOfFirst { it.id == dialog.category.id }
             CategoryFormSheet(
                 category = dialog.category,
-                canMoveUp = index > 0,
-                canMoveDown = index in 0 until state.categories.lastIndex,
                 onSave = { name, color, icon ->
                     onIntent(ExpensesIntent.SaveCategory(dialog.category.id, name, color, icon))
                 },
-                onMove = { up -> onIntent(ExpensesIntent.MoveCategory(dialog.category, up)) },
                 onDelete = { onIntent(ExpensesIntent.DeleteCategoryClicked(dialog.category)) },
                 onDismiss = dismiss,
             )
@@ -121,6 +117,7 @@ private fun ExpensesDialogs(state: ExpensesState, onIntent: (ExpensesIntent) -> 
         is ExpensesDialog.AddExpense -> AddExpenseSheet(
             category = dialog.category,
             accounts = state.accounts,
+            rates = state.rates,
             initialCurrency = state.lastUsedCurrency,
             onSave = { amount, currency, accountId, note, date ->
                 onIntent(ExpensesIntent.SaveExpense(amount, currency, accountId, note, date))

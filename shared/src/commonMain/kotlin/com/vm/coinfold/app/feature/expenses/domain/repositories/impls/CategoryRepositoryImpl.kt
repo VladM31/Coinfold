@@ -33,14 +33,10 @@ class CategoryRepositoryImpl(private val dao: CategoryDao) : CategoryRepository 
             CategoryDeleteResult.DELETED
         }
 
-    override suspend fun move(id: Long, up: Boolean) {
-        val list = dao.observeActive().first().toMutableList()
-        val index = list.indexOfFirst { it.id == id }
-        val target = if (up) index - 1 else index + 1
-        if (index < 0 || target !in list.indices) return
-        val moved = list.removeAt(index)
-        list.add(target, moved)
-        // Rewrite contiguous order values so they stay unique.
-        dao.updateAll(list.mapIndexed { i, entity -> entity.copy(sortOrder = i) })
+    override suspend fun reorder(ids: List<Long>) {
+        val byId = dao.observeActive().first().associateBy { it.id }
+        // Unknown ids are ignored; categories missing from [ids] keep their relative order at the end.
+        val ordered = ids.mapNotNull { byId[it] } + byId.values.filter { it.id !in ids }.sortedBy { it.sortOrder }
+        dao.updateAll(ordered.mapIndexed { index, entity -> entity.copy(sortOrder = index) })
     }
 }

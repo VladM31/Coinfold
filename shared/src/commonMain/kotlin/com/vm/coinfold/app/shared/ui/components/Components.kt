@@ -105,24 +105,26 @@ fun ColorDot(color: Color, size: Int, modifier: Modifier = Modifier) {
 }
 
 /** Button showing the date; opens a date picker dialog on click. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateField(date: LocalDate, onDateChange: (LocalDate) -> Unit, modifier: Modifier = Modifier) {
     var open by remember { mutableStateOf(false) }
     OutlinedButton(onClick = { open = true }, modifier = modifier) { Text(date.format()) }
-    if (open) {
-        val pickerState = rememberDatePickerState(initialSelectedDateMillis = pickerMillisFor(date))
-        DatePickerDialog(
-            onDismissRequest = { open = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    pickerState.selectedDateMillis?.let { onDateChange(dateFromPickerMillis(it)) }
-                    open = false
-                }) { Text(stringResource(Res.string.action_save)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { open = false }) { Text(stringResource(Res.string.action_cancel)) }
-            },
-        ) { DatePicker(state = pickerState) }
-    }
+    if (open) DatePickerDialogHost(date, onDateChange, onDismiss = { open = false })
+}
+
+/** Material date picker dialog for callers that open it from their own control. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerDialogHost(date: LocalDate, onDateChange: (LocalDate) -> Unit, onDismiss: () -> Unit) {
+    val pickerState = rememberDatePickerState(initialSelectedDateMillis = pickerMillisFor(date))
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                pickerState.selectedDateMillis?.let { onDateChange(dateFromPickerMillis(it)) }
+                onDismiss()
+            }) { Text(stringResource(Res.string.action_save)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.action_cancel)) } },
+    ) { DatePicker(state = pickerState) }
 }

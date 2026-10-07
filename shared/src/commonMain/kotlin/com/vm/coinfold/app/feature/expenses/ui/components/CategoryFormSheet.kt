@@ -23,7 +23,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -44,8 +43,6 @@ import coinfold.shared.generated.resources.category_edit_title
 import coinfold.shared.generated.resources.category_icon
 import coinfold.shared.generated.resources.category_icon_tab_emoji
 import coinfold.shared.generated.resources.category_icon_tab_icons
-import coinfold.shared.generated.resources.category_move_earlier
-import coinfold.shared.generated.resources.category_move_later
 import coinfold.shared.generated.resources.category_new_title
 import coinfold.shared.generated.resources.field_color
 import coinfold.shared.generated.resources.field_name
@@ -63,10 +60,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun CategoryFormSheet(
     category: Category?,
-    canMoveUp: Boolean,
-    canMoveDown: Boolean,
     onSave: (name: String, color: Long, icon: String) -> Unit,
-    onMove: (up: Boolean) -> Unit,
     onDelete: (() -> Unit)?,
     onDismiss: () -> Unit,
 ) {
@@ -97,6 +91,19 @@ fun CategoryFormSheet(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
+            // Actions sit above the long icon list so they are always reachable without scrolling.
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                if (onDelete != null) {
+                    TextButton(onClick = onDelete) {
+                        Text(stringResource(Res.string.action_delete), color = MaterialTheme.colorScheme.error)
+                    }
+                } else {
+                    Spacer(Modifier)
+                }
+                Button(enabled = name.isNotBlank(), onClick = { onSave(name, color, icon) }) {
+                    Text(stringResource(Res.string.action_save))
+                }
+            }
             Text(stringResource(Res.string.field_color), style = MaterialTheme.typography.labelLarge)
             ColorPicker(selected = color, onSelected = { color = it ?: color })
             Text(stringResource(Res.string.category_icon), style = MaterialTheme.typography.labelLarge)
@@ -132,29 +139,6 @@ fun CategoryFormSheet(
                             .clickable { icon = candidate },
                         contentAlignment = Alignment.Center,
                     ) { CategoryIcon(candidate, tint = MaterialTheme.colorScheme.onSurface, size = 24) }
-                }
-            }
-            if (category != null) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { onMove(true) }, enabled = canMoveUp) {
-                        Text("← " + stringResource(Res.string.category_move_earlier))
-                    }
-                    OutlinedButton(onClick = { onMove(false) }, enabled = canMoveDown) {
-                        Text(stringResource(Res.string.category_move_later) + " →")
-                    }
-                }
-            }
-            Spacer(Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                if (onDelete != null) {
-                    TextButton(onClick = onDelete) {
-                        Text(stringResource(Res.string.action_delete), color = MaterialTheme.colorScheme.error)
-                    }
-                } else {
-                    Spacer(Modifier)
-                }
-                Button(enabled = name.isNotBlank(), onClick = { onSave(name, color, icon) }) {
-                    Text(stringResource(Res.string.action_save))
                 }
             }
             Spacer(Modifier.height(16.dp))

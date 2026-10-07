@@ -52,8 +52,6 @@
     <string name="category_icon_tab_icons">Icons</string>
     <string name="category_icon_tab_emoji">Emoji</string>
     <string name="category_icon">Icon</string>
-    <string name="category_move_earlier">Earlier</string>
-    <string name="category_move_later">Later</string>
     <string name="category_delete_title">Delete category?</string>
     <string name="category_delete_message">A category that already has expenses is archived instead of deleted; its past expenses stay in the statistics.</string>
     <string name="category_deleted">Category deleted</string>
@@ -111,12 +109,18 @@
 
     <!-- Default categories -->
     <string name="cat_groceries">Groceries</string>
-    <string name="cat_dining">Cafes</string>
-    <string name="cat_transport">Transport</string>
-    <string name="cat_home">Home</string>
+    <string name="cat_pets">Pets</string>
+    <string name="cat_utilities">Utilities</string>
     <string name="cat_health">Health</string>
-    <string name="cat_entertainment">Fun</string>
+    <string name="cat_gifts">Gifts</string>
+    <string name="cat_taxes">Taxes</string>
+    <string name="cat_subscriptions">Subs</string>
+    <string name="cat_transport">Transport</string>
+    <string name="cat_dining">Cafes</string>
     <string name="cat_clothes">Clothes</string>
+    <string name="cat_entertainment">Fun</string>
+    <string name="cat_education">Study</string>
+    <string name="cat_sport">Sport</string>
     <string name="cat_other">Other</string>
 
     <!-- Overview -->
@@ -130,4 +134,12 @@
     <string name="overview_by_category">By category</string>
     <string name="overview_other">Other</string>
     <string name="overview_no_expenses">No expenses in this period</string>
+
+    <!-- Expense sheet -->
+    <string name="expense_from_account">From account</string>
+    <string name="expense_to_category">To category</string>
+    <string name="expense_withdrawal">Withdrawal</string>
+    <string name="expense_amount_label">Expense</string>
+    <string name="expense_notes">Notes…</string>
+    <string name="date_today">Today</string>
 </resources>

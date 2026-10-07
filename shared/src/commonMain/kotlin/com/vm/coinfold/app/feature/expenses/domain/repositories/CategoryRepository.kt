@@ -12,6 +12,6 @@ interface CategoryRepository {
     /** Deletes the category, or archives it if it already has transactions. */
     suspend fun delete(id: Long): CategoryDeleteResult
 
-    /** Swaps the category with its neighbour; no-op at the ends of the list. */
-    suspend fun move(id: Long, up: Boolean)
+    /** Stores the given order (ids of active categories, first = leftmost). */
+    suspend fun reorder(ids: List<Long>)
 }

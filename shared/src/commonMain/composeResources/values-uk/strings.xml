@@ -52,8 +52,6 @@
     <string name="category_icon_tab_icons">Іконки</string>
     <string name="category_icon_tab_emoji">Емодзі</string>
     <string name="category_icon">Іконка</string>
-    <string name="category_move_earlier">Раніше</string>
-    <string name="category_move_later">Пізніше</string>
     <string name="category_delete_title">Видалити категорію?</string>
     <string name="category_delete_message">Категорію з витратами буде архівовано замість видалення; минулі витрати залишаться в статистиці.</string>
     <string name="category_deleted">Категорію видалено</string>
@@ -111,12 +109,18 @@
 
     <!-- Default categories -->
     <string name="cat_groceries">Продукти</string>
-    <string name="cat_dining">Кафе</string>
+    <string name="cat_pets">Питомці</string>
+    <string name="cat_utilities">Комуналка</string>
+    <string name="cat_health">Здоров’я</string>
+    <string name="cat_gifts">Подарунки</string>
+    <string name="cat_taxes">Податки</string>
+    <string name="cat_subscriptions">Підписки</string>
     <string name="cat_transport">Транспорт</string>
-    <string name="cat_home">Дім</string>
-    <string name="cat_health">Медицина</string>
-    <string name="cat_entertainment">Розваги</string>
+    <string name="cat_dining">Кафе</string>
     <string name="cat_clothes">Одяг</string>
+    <string name="cat_entertainment">Розваги</string>
+    <string name="cat_education">Навчання</string>
+    <string name="cat_sport">Спорт</string>
     <string name="cat_other">Інше</string>
 
     <!-- Overview -->
@@ -130,4 +134,12 @@
     <string name="overview_by_category">За категоріями</string>
     <string name="overview_other">Інше</string>
     <string name="overview_no_expenses">У цьому періоді немає витрат</string>
+
+    <!-- Expense sheet -->
+    <string name="expense_from_account">З рахунку</string>
+    <string name="expense_to_category">До категорії</string>
+    <string name="expense_withdrawal">Списання</string>
+    <string name="expense_amount_label">Витрата</string>
+    <string name="expense_notes">Нотатки…</string>
+    <string name="date_today">Сьогодні</string>
 </resources>

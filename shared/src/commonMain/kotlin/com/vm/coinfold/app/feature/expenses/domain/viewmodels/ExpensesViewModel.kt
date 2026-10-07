@@ -88,6 +88,7 @@ class ExpensesViewModel(
             summary = calculateSummary(data.totals, data.categories, data.rates, data.settings.mainCurrency),
             accounts = accounts,
             lastUsedCurrency = data.settings.lastUsedCurrency,
+            rates = data.rates,
             dialog = dialog,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ExpensesState())
@@ -103,8 +104,8 @@ class ExpensesViewModel(
             is ExpensesIntent.SaveCategory -> saveCategory(intent)
             is ExpensesIntent.DeleteCategoryClicked -> dialog.value = ExpensesDialog.ConfirmDeleteCategory(intent.category)
             ExpensesIntent.ConfirmDeleteCategory -> confirmDelete()
-            is ExpensesIntent.MoveCategory ->
-                viewModelScope.launch { categoryRepository.move(intent.category.id, intent.up) }
+            is ExpensesIntent.ReorderCategories ->
+                viewModelScope.launch { categoryRepository.reorder(intent.ids) }
             is ExpensesIntent.SaveExpense -> saveExpense(intent)
         }
     }

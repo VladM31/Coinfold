@@ -2,6 +2,7 @@ package com.vm.coinfold.app.feature.expenses.domain.viewmodels
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
+import com.vm.coinfold.app.feature.currency.domain.models.RateTable
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.feature.expenses.domain.models.ExpenseSummary
 import com.vm.coinfold.app.shared.domain.models.Currency
@@ -17,6 +18,8 @@ data class ExpensesState(
     val summary: ExpenseSummary? = null,
     val accounts: List<AccountWithBalance> = emptyList(),
     val lastUsedCurrency: Currency = Currency.UAH,
+    /** Known exchange rates, used by the expense sheet to show the amount that leaves the account. */
+    val rates: RateTable = RateTable.Empty,
     val dialog: ExpensesDialog? = null,
 )
 
@@ -37,7 +40,7 @@ sealed interface ExpensesIntent {
     data class SaveCategory(val id: Long?, val name: String, val color: Long, val icon: String) : ExpensesIntent
     data class DeleteCategoryClicked(val category: Category) : ExpensesIntent
     data object ConfirmDeleteCategory : ExpensesIntent
-    data class MoveCategory(val category: Category, val up: Boolean) : ExpensesIntent
+    data class ReorderCategories(val ids: List<Long>) : ExpensesIntent
     data class SaveExpense(
         val amount: BigDecimal,
         val currency: Currency,

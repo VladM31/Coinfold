@@ -2,7 +2,6 @@ package com.vm.coinfold.app.feature.settings.db.storages
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -38,20 +37,23 @@ class SettingsStorage(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { it[LAST_USED_CURRENCY] = value }
     }
 
-    /** Returns true only the first time it is called, so one-time setup runs exactly once. */
-    suspend fun markCategoriesSeeded(): Boolean {
-        var first = false
+    /**
+     * Returns true if the default categories of [version] have not been applied yet, and records that they
+     * are now. A larger [version] makes this return true once more, which is how the defaults are replaced.
+     */
+    suspend fun claimDefaultCategories(version: Int): Boolean {
+        var claimed = false
         dataStore.edit {
-            if (it[CATEGORIES_SEEDED] != true) {
-                it[CATEGORIES_SEEDED] = true
-                first = true
+            if ((it[DEFAULT_CATEGORIES_VERSION] ?: 0) < version) {
+                it[DEFAULT_CATEGORIES_VERSION] = version
+                claimed = true
             }
         }
-        return first
+        return claimed
     }
 
     private companion object {
-        val CATEGORIES_SEEDED = booleanPreferencesKey("categories_seeded")
+        val DEFAULT_CATEGORIES_VERSION = intPreferencesKey("default_categories_version")
         val THEME = stringPreferencesKey("theme")
         val LANGUAGE = stringPreferencesKey("language")
         val MAIN_CURRENCY = stringPreferencesKey("main_currency")

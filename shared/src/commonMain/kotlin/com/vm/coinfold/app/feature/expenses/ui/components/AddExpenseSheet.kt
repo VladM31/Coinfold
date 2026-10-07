@@ -1,12 +1,11 @@
 package com.vm.coinfold.app.feature.expenses.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -14,14 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,168 +29,191 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
-import coinfold.shared.generated.resources.action_save
-import coinfold.shared.generated.resources.expense_account
+import coinfold.shared.generated.resources.date_today
+import coinfold.shared.generated.resources.expense_amount_label
 import coinfold.shared.generated.resources.expense_no_accounts
-import coinfold.shared.generated.resources.expense_title
-import coinfold.shared.generated.resources.field_amount
-import coinfold.shared.generated.resources.field_currency
-import coinfold.shared.generated.resources.field_note
+import coinfold.shared.generated.resources.expense_notes
+import coinfold.shared.generated.resources.expense_withdrawal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
+import com.vm.coinfold.app.feature.currency.domain.models.RateTable
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.Money
-import com.vm.coinfold.app.shared.ui.components.CategoryBadge
-import com.vm.coinfold.app.shared.ui.components.CurrencySelector
-import com.vm.coinfold.app.shared.ui.components.DateField
+import com.vm.coinfold.app.shared.ui.components.DatePickerDialogHost
+import com.vm.coinfold.app.shared.ui.components.LocalAppLanguage
 import com.vm.coinfold.app.utils.Calculator
 import com.vm.coinfold.app.utils.CalculatorInput
 import com.vm.coinfold.app.utils.OP_DIVIDE
 import com.vm.coinfold.app.utils.OP_MINUS
 import com.vm.coinfold.app.utils.OP_PLUS
 import com.vm.coinfold.app.utils.OP_TIMES
+import com.vm.coinfold.app.utils.format
 import com.vm.coinfold.app.utils.today
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 
-/** Bottom sheet opened from a category circle: amount with mini-calculator, currency, account, note, date. */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+private const val OPERATORS = "$OP_PLUS$OP_MINUS$OP_TIMES$OP_DIVIDE"
+
+/**
+ * Bottom sheet opened from a category circle. Only what is needed to record an expense: the amount
+ * (with a calculator), its currency, the account and an optional note; the date is one key away.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseSheet(
     category: Category,
     accounts: List<AccountWithBalance>,
+    rates: RateTable,
     initialCurrency: Currency,
     onSave: (amount: BigDecimal, currency: Currency, accountId: Long, note: String, date: LocalDate) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val language = LocalAppLanguage.current
     var expression by remember { mutableStateOf("") }
     var currency by remember { mutableStateOf(initialCurrency) }
     var accountId by remember { mutableStateOf(accounts.firstOrNull()?.account?.id) }
     var note by remember { mutableStateOf("") }
     var date by remember { mutableStateOf(today()) }
+    var datePickerOpen by remember { mutableStateOf(false) }
 
-    // The result is computed from the expression and only valid if it is a positive amount.
+    val account = accounts.firstOrNull { it.account.id == accountId }
+    val categoryColor = Color(category.color)
+
+    // The typed expression is evaluated live; it is valid only if it gives a positive amount.
     val result = Calculator.evaluate(expression)
-    val money = result?.let { Money.of(it, currency) }
-    val canSave = money != null && money.minorUnits > 0 && accountId != null
-    val hasOperator = expression.drop(1).any { it in "+$OP_MINUS$OP_TIMES$OP_DIVIDE" }
+    val entered = result?.let { Money.of(it, currency) }?.takeIf { it.minorUnits > 0 }
+    // What leaves the account: the same amount, or the converted one when the currencies differ.
+    val fromAccount = if (entered != null && account != null) {
+        rates.convert(entered, account.account.currency)?.money
+    } else {
+        null
+    }
+    val canSave = entered != null && fromAccount != null && account != null
+    val hasOperator = expression.drop(1).any { it in OPERATORS }
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(
-            Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
-                .navigationBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                CategoryBadge(category.icon, Color(category.color), size = 36)
-                Text(
-                    stringResource(Res.string.expense_title, category.name),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            }
-
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        dragHandle = null,
+    ) {
+        Column(Modifier.navigationBarsPadding().verticalScroll(rememberScrollState())) {
             if (accounts.isEmpty()) {
-                Text(stringResource(Res.string.expense_no_accounts), color = MaterialTheme.colorScheme.error)
-                Spacer(Modifier.height(24.dp))
+                Text(
+                    stringResource(Res.string.expense_no_accounts),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(24.dp),
+                )
                 return@Column
             }
 
-            Column {
-                Text(
-                    stringResource(Res.string.field_amount),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = expression.ifEmpty { "0" },
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (expression.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant
-                    else MaterialTheme.colorScheme.onSurface,
-                )
-                if (hasOperator && money != null) {
-                    Text(
-                        "= ${money.toBigDecimal().toPlainString()} ${currency.code}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            }
-            CalculatorKeypad(
-                onKey = { expression = CalculatorInput.append(expression, it) },
-                onBackspace = { expression = CalculatorInput.backspace(expression) },
+            ExpenseSheetHeader(
+                accounts = accounts,
+                selectedAccount = account,
+                category = category,
+                onAccountSelected = { accountId = it.account.id },
             )
 
-            Text(stringResource(Res.string.field_currency), style = MaterialTheme.typography.labelLarge)
-            CurrencySelector(currency, onSelected = { currency = it })
-
-            Text(stringResource(Res.string.expense_account), style = MaterialTheme.typography.labelLarge)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                accounts.forEach { item ->
-                    FilterChip(
-                        selected = item.account.id == accountId,
-                        onClick = { accountId = item.account.id },
-                        label = { Text("${item.account.name} · ${item.account.currency.code}") },
-                    )
-                }
-            }
-
-            OutlinedTextField(
-                value = note,
-                onValueChange = { note = it },
-                label = { Text(stringResource(Res.string.field_note)) },
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                DateField(date, onDateChange = { date = it })
-                Button(
-                    enabled = canSave,
-                    onClick = {
+                Row(
+                    Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    AmountCard(
+                        label = stringResource(Res.string.expense_withdrawal),
+                        value = fromAccount?.format(language) ?: "—",
+                        subtitle = null,
+                        container = MaterialTheme.colorScheme.primaryContainer,
+                        content = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                    )
+                    AmountCard(
+                        label = stringResource(Res.string.expense_amount_label),
+                        value = "${expression.ifEmpty { "0" }} ${currency.code}",
+                        subtitle = if (hasOperator && entered != null) "= ${entered.format(language)}" else null,
+                        container = categoryColor.copy(alpha = 0.16f),
+                        content = categoryColor,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                    )
+                }
+
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    placeholder = { Text(stringResource(Res.string.expense_notes)) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                ExpenseKeypad(
+                    currency = currency,
+                    accent = categoryColor,
+                    confirmEnabled = canSave,
+                    onKey = { expression = CalculatorInput.append(expression, it) },
+                    onBackspace = { expression = CalculatorInput.backspace(expression) },
+                    onCurrencyClick = { currency = Currency.entries[(currency.ordinal + 1) % Currency.entries.size] },
+                    onDateClick = { datePickerOpen = true },
+                    onConfirm = {
                         val id = accountId
                         if (result != null && id != null) onSave(result, currency, id, note, date)
                     },
-                ) { Text(stringResource(Res.string.action_save)) }
+                )
+
+                Text(
+                    text = if (date == today()) {
+                        stringResource(Res.string.date_today) + ", " + date.format()
+                    } else {
+                        date.format()
+                    },
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(4.dp))
             }
-            Spacer(Modifier.height(16.dp))
         }
+    }
+
+    if (datePickerOpen) {
+        DatePickerDialogHost(date, onDateChange = { date = it }, onDismiss = { datePickerOpen = false })
     }
 }
 
-private val KEY_ROWS = listOf(
-    listOf('7', '8', '9', OP_DIVIDE),
-    listOf('4', '5', '6', OP_TIMES),
-    listOf('1', '2', '3', OP_MINUS),
-    listOf('.', '0', '⌫', OP_PLUS),
-)
-
 @Composable
-private fun CalculatorKeypad(onKey: (Char) -> Unit, onBackspace: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        KEY_ROWS.forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                row.forEach { key ->
-                    val isOperator = key in "+$OP_MINUS$OP_TIMES$OP_DIVIDE"
-                    Surface(
-                        onClick = { if (key == '⌫') onBackspace() else onKey(key) },
-                        shape = RoundedCornerShape(12.dp),
-                        color = if (isOperator) MaterialTheme.colorScheme.primaryContainer
-                        else MaterialTheme.colorScheme.surfaceVariant,
-                        modifier = Modifier.weight(1f).height(48.dp),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(key.toString(), style = MaterialTheme.typography.titleLarge)
-                        }
-                    }
-                }
+private fun AmountCard(
+    label: String,
+    value: String,
+    subtitle: String?,
+    container: Color,
+    content: Color,
+    modifier: Modifier = Modifier,
+) {
+    Surface(modifier = modifier, shape = RoundedCornerShape(14.dp), color = container) {
+        Column(
+            Modifier.padding(vertical = 10.dp, horizontal = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(label, style = MaterialTheme.typography.labelMedium, color = content)
+            Text(
+                value,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Medium,
+                color = content,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (subtitle != null) {
+                Text(subtitle, style = MaterialTheme.typography.labelMedium, color = content)
             }
         }
     }
