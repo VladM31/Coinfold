@@ -85,22 +85,6 @@ fun AccountFormSheet(
             )
             CategoryBadge(icon, Color(color), size = 64, modifier = Modifier.align(Alignment.CenterHorizontally))
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text(stringResource(Res.string.field_name)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Text(stringResource(Res.string.field_currency), style = MaterialTheme.typography.labelLarge)
-            CurrencySelector(currency, onSelected = { currency = it }, enabled = !currencyLocked)
-            if (currencyLocked) {
-                Text(
-                    stringResource(Res.string.accounts_currency_locked),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            OutlinedTextField(
                 value = initial,
                 onValueChange = { initial = it },
                 label = { Text(stringResource(Res.string.accounts_initial_balance)) },
@@ -108,6 +92,13 @@ fun AccountFormSheet(
                 isError = initialValue == null,
                 // Plain text keyboard so a leading minus can be typed.
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text(stringResource(Res.string.field_name)) },
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
             // Actions sit above the long icon/color lists so they are always reachable without scrolling.
@@ -123,6 +114,15 @@ fun AccountFormSheet(
                     enabled = canSave,
                     onClick = { initialValue?.let { onSave(name, currency, it, color, icon) } },
                 ) { Text(stringResource(Res.string.action_save)) }
+            }
+            Text(stringResource(Res.string.field_currency), style = MaterialTheme.typography.labelLarge)
+            CurrencySelector(currency, onSelected = { currency = it }, enabled = !currencyLocked)
+            if (currencyLocked) {
+                Text(
+                    stringResource(Res.string.accounts_currency_locked),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             IconColorPicker(
                 icon = icon,

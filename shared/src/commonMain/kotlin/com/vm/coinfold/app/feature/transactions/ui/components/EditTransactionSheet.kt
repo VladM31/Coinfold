@@ -132,6 +132,35 @@ fun EditTransactionSheet(
                 modifier = Modifier.fillMaxWidth(),
             )
 
+            OutlinedTextField(
+                value = note,
+                onValueChange = { note = it },
+                label = { Text(stringResource(Res.string.field_note)) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            // Amount, note and the actions are at the top; everything else follows below.
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                TextButton(onClick = onDelete) {
+                    Text(stringResource(Res.string.action_delete), color = MaterialTheme.colorScheme.error)
+                }
+                Button(
+                    enabled = canSave,
+                    onClick = {
+                        amountValue?.let {
+                            onSave(
+                                it,
+                                shownCurrency,
+                                accountId,
+                                categoryId.takeIf { isCategorized },
+                                if (isIncome) resolveSource(selectedSource, customText) else null,
+                                note,
+                                date,
+                            )
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                ) { Text(stringResource(Res.string.action_save)) }
+            }
             if (isCategorized) {
                 Text(stringResource(Res.string.field_currency), style = MaterialTheme.typography.labelLarge)
                 CurrencySelector(currency, onSelected = { currency = it })
@@ -181,37 +210,8 @@ fun EditTransactionSheet(
                 )
             }
 
-            OutlinedTextField(
-                value = note,
-                onValueChange = { note = it },
-                label = { Text(stringResource(Res.string.field_note)) },
-                modifier = Modifier.fillMaxWidth(),
-            )
             DateField(date, onDateChange = { date = it })
 
-            Spacer(Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                TextButton(onClick = onDelete) {
-                    Text(stringResource(Res.string.action_delete), color = MaterialTheme.colorScheme.error)
-                }
-                Button(
-                    enabled = canSave,
-                    onClick = {
-                        amountValue?.let {
-                            onSave(
-                                it,
-                                shownCurrency,
-                                accountId,
-                                categoryId.takeIf { isCategorized },
-                                if (isIncome) resolveSource(selectedSource, customText) else null,
-                                note,
-                                date,
-                            )
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                ) { Text(stringResource(Res.string.action_save)) }
-            }
             Spacer(Modifier.height(16.dp))
         }
     }
