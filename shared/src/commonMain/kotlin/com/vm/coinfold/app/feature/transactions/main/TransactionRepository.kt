@@ -23,6 +23,17 @@ interface TransactionRepository {
         note: String,
         dateTime: Long,
     )
+
+    /** Adds a categorized expense; [accountAmount] is [amount] converted at [rate] into the account currency. */
+    suspend fun addExpense(
+        accountId: Long,
+        categoryId: Long,
+        amount: Money,
+        accountAmount: Money,
+        rate: BigDecimal,
+        note: String,
+        dateTime: Long,
+    )
 }
 
 class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRepository {
@@ -47,6 +58,31 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
                 currency = amount.currency,
                 accountAmountMinor = amount.minorUnits,
                 rate = BigDecimal.ONE.toPlainString(),
+                note = note.trim(),
+                dateTime = dateTime,
+            ),
+        )
+    }
+
+    override suspend fun addExpense(
+        accountId: Long,
+        categoryId: Long,
+        amount: Money,
+        accountAmount: Money,
+        rate: BigDecimal,
+        note: String,
+        dateTime: Long,
+    ) {
+        require(amount.minorUnits > 0 && accountAmount.minorUnits > 0) { "Amount must be positive" }
+        dao.insert(
+            TransactionEntity(
+                type = TransactionType.EXPENSE,
+                accountId = accountId,
+                categoryId = categoryId,
+                amountMinor = amount.minorUnits,
+                currency = amount.currency,
+                accountAmountMinor = accountAmount.minorUnits,
+                rate = rate.toPlainString(),
                 note = note.trim(),
                 dateTime = dateTime,
             ),

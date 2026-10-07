@@ -41,4 +41,24 @@
     <string name="source_debt_return">Debt return</string>
     <string name="source_gift">Gift</string>
     <string name="source_other">Other</string>
+
+    <!-- Expenses -->
+    <string name="expenses_income">Income</string>
+    <string name="expenses_spent">Spent</string>
+    <string name="expenses_left">Left</string>
+    <string name="expenses_overspent">Overspent</string>
+    <string name="category_add">Add</string>
+    <string name="category_new_title">New category</string>
+    <string name="category_edit_title">Edit category</string>
+    <string name="category_icon">Icon</string>
+    <string name="category_move_earlier">Earlier</string>
+    <string name="category_move_later">Later</string>
+    <string name="category_delete_title">Delete category?</string>
+    <string name="category_delete_message">A category that already has expenses is archived instead of deleted; its past expenses stay in the statistics.</string>
+    <string name="category_deleted">Category deleted</string>
+    <string name="category_archived">Category archived</string>
+    <string name="expense_title">Expense: %1$s</string>
+    <string name="expense_account">Account</string>
+    <string name="expense_no_accounts">Create an account first (Accounts tab) to add expenses.</string>
+    <string name="expense_no_rate">No exchange rate available yet. Connect to the internet once, or use the currency of the account.</string>
 </resources>

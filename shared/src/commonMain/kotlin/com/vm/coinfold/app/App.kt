@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.vm.coinfold.app.config.Route
 import com.vm.coinfold.app.feature.accounts.ui.AccountsScreen
 import com.vm.coinfold.app.feature.currency.main.CurrencyRepository
+import com.vm.coinfold.app.feature.expenses.ui.ExpensesScreen
 import com.vm.coinfold.app.feature.settings.main.AppLanguage
 import com.vm.coinfold.app.feature.settings.main.Settings
 import com.vm.coinfold.app.feature.settings.main.SettingsRepository
@@ -81,6 +82,7 @@ fun App() {
                     composable(route.path) {
                         when (route) {
                             Route.Accounts -> AccountsScreen()
+                            Route.Expenses -> ExpensesScreen()
                             else -> ComingSoon(stringResource(route.label))
                         }
                     }

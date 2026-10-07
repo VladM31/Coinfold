@@ -17,6 +17,12 @@ interface CategoryDao {
     @Query("SELECT COALESCE(MAX(sortOrder), -1) FROM categories")
     suspend fun maxOrder(): Int
 
+    @Query("SELECT COUNT(*) FROM transactions WHERE categoryId = :id")
+    suspend fun countTransactions(id: Long): Int
+
+    @Query("UPDATE categories SET isArchived = 1 WHERE id = :id")
+    suspend fun archive(id: Long)
+
     @Insert
     suspend fun insert(category: CategoryEntity): Long
 
