@@ -5,9 +5,16 @@ plugins {
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
+    compilerOptions {
+        // Room generates actuals for the expect AppDatabaseConstructor
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -41,6 +48,7 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
+            implementation(libs.koin.android)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
         }
@@ -53,6 +61,16 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.bignum)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.androidx.datastore.preferences)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -60,6 +78,14 @@ kotlin {
     }
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
+    // Room code generation for every target
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     androidRuntimeClasspath(libs.compose.uiTooling)
 }
