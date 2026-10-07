@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Coinfold</string>
+    <string name="nav_accounts">Рахунки</string>
+    <string name="nav_expenses">Витрати</string>
+    <string name="nav_transactions">Транзакції</string>
+    <string name="nav_settings">Налаштування</string>
+    <string name="placeholder_coming_soon">Незабаром</string>
+</resources>
