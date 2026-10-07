@@ -24,6 +24,7 @@ import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.category_add
 import com.vm.coinfold.app.feature.expenses.domain.models.CategorySpend
 import com.vm.coinfold.app.feature.expenses.domain.viewmodels.ExpensesIntent
+import com.vm.coinfold.app.shared.ui.components.CategoryBadge
 import com.vm.coinfold.app.shared.ui.components.LocalAppLanguage
 import com.vm.coinfold.app.utils.format
 import org.jetbrains.compose.resources.stringResource
@@ -59,10 +60,7 @@ fun CategoryCircle(item: CategorySpend, onIntent: (ExpensesIntent) -> Unit) {
             )
             .padding(4.dp),
     ) {
-        Box(
-            Modifier.size(56.dp).clip(CircleShape).background(Color(category.color)),
-            contentAlignment = Alignment.Center,
-        ) { Text(category.icon, style = MaterialTheme.typography.titleLarge) }
+        CategoryBadge(category.icon, Color(category.color), size = 56)
         Text(category.name, style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
         if (item.spent.minorUnits > 0) {
             Text(

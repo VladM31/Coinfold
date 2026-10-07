@@ -46,6 +46,7 @@ import com.vm.coinfold.app.feature.transactions.domain.models.TransactionItem
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.TransactionType
+import com.vm.coinfold.app.shared.ui.components.CategoryIcon
 import com.vm.coinfold.app.shared.ui.components.CurrencySelector
 import com.vm.coinfold.app.shared.ui.components.DateField
 import com.vm.coinfold.app.shared.ui.components.IncomeSourcePicker
@@ -150,7 +151,10 @@ fun EditTransactionSheet(
                         FilterChip(
                             selected = categoryId == id,
                             onClick = { categoryId = id },
-                            label = { Text("$icon $name") },
+                            label = { Text(name) },
+                            leadingIcon = {
+                                CategoryIcon(icon, tint = MaterialTheme.colorScheme.onSurfaceVariant, size = 18)
+                            },
                         )
                     }
                 }

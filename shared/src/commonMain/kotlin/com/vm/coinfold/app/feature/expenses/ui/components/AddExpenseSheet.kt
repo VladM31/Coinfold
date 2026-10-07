@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
@@ -44,6 +45,7 @@ import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.Money
+import com.vm.coinfold.app.shared.ui.components.CategoryBadge
 import com.vm.coinfold.app.shared.ui.components.CurrencySelector
 import com.vm.coinfold.app.shared.ui.components.DateField
 import com.vm.coinfold.app.utils.Calculator
@@ -86,10 +88,13 @@ fun AddExpenseSheet(
                 .navigationBarsPadding(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(
-                stringResource(Res.string.expense_title, category.icon + " " + category.name),
-                style = MaterialTheme.typography.titleLarge,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                CategoryBadge(category.icon, Color(category.color), size = 36)
+                Text(
+                    stringResource(Res.string.expense_title, category.name),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
 
             if (accounts.isEmpty()) {
                 Text(stringResource(Res.string.expense_no_accounts), color = MaterialTheme.colorScheme.error)

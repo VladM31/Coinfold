@@ -16,7 +16,8 @@ object CategoryIcons {
         "💡", "📱", "🎬", "👕", "💊", "🎁",
         "✈️", "🐾", "🎓", "🏋️", "💼", "📦",
     )
-    val default: String = all.first()
+    /** Default for new categories: the shopping cart from the vector catalog (stored as `icon:<key>`). */
+    const val default: String = "icon:cart"
 }
 
 enum class CategoryDeleteResult { DELETED, ARCHIVED }

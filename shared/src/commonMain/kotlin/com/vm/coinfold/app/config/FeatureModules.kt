@@ -9,6 +9,9 @@ import com.vm.coinfold.app.feature.expenses.domain.repositories.impls.CategoryRe
 import com.vm.coinfold.app.feature.expenses.domain.repositories.impls.ExpenseStatsRepositoryImpl
 import com.vm.coinfold.app.feature.expenses.domain.usecases.SeedDefaultCategoriesUseCase
 import com.vm.coinfold.app.feature.expenses.domain.viewmodels.ExpensesViewModel
+import com.vm.coinfold.app.feature.overview.domain.repositories.OverviewRepository
+import com.vm.coinfold.app.feature.overview.domain.repositories.impls.OverviewRepositoryImpl
+import com.vm.coinfold.app.feature.overview.domain.viewmodels.OverviewViewModel
 import com.vm.coinfold.app.feature.settings.domain.viewmodels.SettingsViewModel
 import com.vm.coinfold.app.feature.transactions.domain.repositories.TransactionRepository
 import com.vm.coinfold.app.feature.transactions.domain.repositories.impls.TransactionRepositoryImpl
@@ -41,5 +44,10 @@ val expensesModule = module {
 
 val settingsModule = module {
     viewModelOf(::SettingsViewModel)
+}
+
+val overviewModule = module {
+    single<OverviewRepository> { OverviewRepositoryImpl(get()) }
+    viewModelOf(::OverviewViewModel)
 }
 

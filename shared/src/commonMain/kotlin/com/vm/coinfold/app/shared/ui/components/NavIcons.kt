@@ -16,7 +16,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-enum class NavIconKind { ACCOUNTS, EXPENSES, TRANSACTIONS, SETTINGS }
+enum class NavIconKind { ACCOUNTS, EXPENSES, OVERVIEW, TRANSACTIONS, SETTINGS }
 
 /**
  * Bottom navigation icons drawn on a 24x24 grid with the same stroke width, so all four have
@@ -30,6 +30,7 @@ fun NavIcon(kind: NavIconKind, tint: Color, modifier: Modifier = Modifier) {
         when (kind) {
             NavIconKind.ACCOUNTS -> drawWallet(tint, unit, stroke)
             NavIconKind.EXPENSES -> drawRing(tint, unit, stroke)
+            NavIconKind.OVERVIEW -> drawBars(tint, unit, stroke)
             NavIconKind.TRANSACTIONS -> drawList(tint, unit, stroke)
             NavIconKind.SETTINGS -> drawGear(tint, unit, stroke)
         }
@@ -60,6 +61,14 @@ private fun DrawScope.drawRing(tint: Color, u: Float, stroke: Stroke) {
         style = stroke,
     )
     drawCircle(tint, radius = 1.6f * u, center = Offset(12f * u, 12f * u))
+}
+
+private fun DrawScope.drawBars(tint: Color, u: Float, stroke: Stroke) {
+    // Three bars of different height standing on a baseline.
+    listOf(5f to 10f, 12f to 5f, 19f to 13f).forEach { (x, top) ->
+        drawLine(tint, Offset(x * u, 20f * u), Offset(x * u, top * u + 3f * u), strokeWidth = 3.2f * u, cap = StrokeCap.Round)
+    }
+    drawLine(tint, Offset(2.5f * u, 21f * u), Offset(21.5f * u, 21f * u), strokeWidth = stroke.width, cap = StrokeCap.Round)
 }
 
 private fun DrawScope.drawList(tint: Color, u: Float, stroke: Stroke) {

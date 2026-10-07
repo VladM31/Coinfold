@@ -26,6 +26,7 @@ import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.transaction_manual_withdrawal
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionItem
 import com.vm.coinfold.app.shared.domain.models.TransactionType
+import com.vm.coinfold.app.shared.ui.components.CategoryBadge
 import com.vm.coinfold.app.shared.ui.components.LocalAppLanguage
 import com.vm.coinfold.app.shared.ui.components.displayName
 import com.vm.coinfold.app.shared.ui.theme.IncomeGreen
@@ -41,18 +42,22 @@ fun TransactionListItem(item: TransactionItem, onClick: () -> Unit) {
         isIncome -> item.source?.displayName().orEmpty()
         else -> stringResource(Res.string.transaction_manual_withdrawal)
     }
-    val badgeColor = item.category?.let { Color(it.color) } ?: if (isIncome) IncomeGreen else MaterialTheme.colorScheme.outline
-    val badgeText = item.category?.icon ?: if (isIncome) "+" else "−"
+    val badgeColor = if (isIncome) IncomeGreen else MaterialTheme.colorScheme.outline
 
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Box(
-            Modifier.size(40.dp).clip(CircleShape).background(badgeColor),
-            contentAlignment = Alignment.Center,
-        ) { Text(badgeText, style = MaterialTheme.typography.titleMedium, color = Color.White) }
+        val category = item.category
+        if (category != null) {
+            CategoryBadge(category.icon, Color(category.color))
+        } else {
+            Box(
+                Modifier.size(40.dp).clip(CircleShape).background(badgeColor),
+                contentAlignment = Alignment.Center,
+            ) { Text(if (isIncome) "+" else "−", style = MaterialTheme.typography.titleMedium, color = Color.White) }
+        }
 
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)

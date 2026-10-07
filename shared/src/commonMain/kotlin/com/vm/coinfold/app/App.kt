@@ -24,6 +24,7 @@ import com.vm.coinfold.app.feature.accounts.ui.screens.AccountsScreen
 import com.vm.coinfold.app.feature.currency.domain.repositories.CurrencyRepository
 import com.vm.coinfold.app.feature.expenses.domain.usecases.SeedDefaultCategoriesUseCase
 import com.vm.coinfold.app.feature.expenses.ui.screens.ExpensesScreen
+import com.vm.coinfold.app.feature.overview.ui.screens.OverviewScreen
 import com.vm.coinfold.app.feature.settings.domain.models.AppLanguage
 import com.vm.coinfold.app.feature.settings.domain.models.ThemeMode
 import com.vm.coinfold.app.feature.settings.domain.repositories.SettingsRepository
@@ -105,7 +106,7 @@ private fun AppScaffold(navController: androidx.navigation.NavHostController) {
                                 else MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         },
-                        label = { Text(stringResource(route.label)) },
+                        label = { Text(stringResource(route.label), maxLines = 1, softWrap = false) },
                     )
                 }
             }
@@ -117,6 +118,7 @@ private fun AppScaffold(navController: androidx.navigation.NavHostController) {
                     when (route) {
                         Route.Accounts -> AccountsScreen()
                         Route.Expenses -> ExpensesScreen()
+                        Route.Overview -> OverviewScreen()
                         Route.Transactions -> TransactionsScreen()
                         Route.Settings -> SettingsScreen()
                     }

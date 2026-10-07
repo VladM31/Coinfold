@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -34,12 +35,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.action_delete
 import coinfold.shared.generated.resources.action_save
 import coinfold.shared.generated.resources.category_edit_title
 import coinfold.shared.generated.resources.category_icon
+import coinfold.shared.generated.resources.category_icon_tab_emoji
+import coinfold.shared.generated.resources.category_icon_tab_icons
 import coinfold.shared.generated.resources.category_move_earlier
 import coinfold.shared.generated.resources.category_move_later
 import coinfold.shared.generated.resources.category_new_title
@@ -47,6 +51,9 @@ import coinfold.shared.generated.resources.field_color
 import coinfold.shared.generated.resources.field_name
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.feature.expenses.domain.models.CategoryIcons
+import com.vm.coinfold.app.shared.ui.components.CategoryBadge
+import com.vm.coinfold.app.shared.ui.components.CategoryIcon
+import com.vm.coinfold.app.shared.ui.components.CategoryIconCatalog
 import com.vm.coinfold.app.shared.ui.components.ColorPalette
 import com.vm.coinfold.app.shared.ui.components.ColorPicker
 import org.jetbrains.compose.resources.stringResource
@@ -66,6 +73,8 @@ fun CategoryFormSheet(
     var name by remember { mutableStateOf(category?.name.orEmpty()) }
     var color by remember { mutableStateOf(category?.color ?: ColorPalette.first()) }
     var icon by remember { mutableStateOf(category?.icon ?: CategoryIcons.default) }
+    // Open on the tab that contains the current icon.
+    var showEmoji by remember { mutableStateOf(CategoryIconCatalog.find(icon) == null) }
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
@@ -79,6 +88,8 @@ fun CategoryFormSheet(
                 stringResource(if (category == null) Res.string.category_new_title else Res.string.category_edit_title),
                 style = MaterialTheme.typography.titleLarge,
             )
+            // Live preview of the badge as it will look in the grid.
+            CategoryBadge(icon, Color(color), size = 64, modifier = Modifier.align(Alignment.CenterHorizontally))
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -89,8 +100,25 @@ fun CategoryFormSheet(
             Text(stringResource(Res.string.field_color), style = MaterialTheme.typography.labelLarge)
             ColorPicker(selected = color, onSelected = { color = it ?: color })
             Text(stringResource(Res.string.category_icon), style = MaterialTheme.typography.labelLarge)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    selected = !showEmoji,
+                    onClick = { showEmoji = false },
+                    label = { Text(stringResource(Res.string.category_icon_tab_icons)) },
+                )
+                FilterChip(
+                    selected = showEmoji,
+                    onClick = { showEmoji = true },
+                    label = { Text(stringResource(Res.string.category_icon_tab_emoji)) },
+                )
+            }
+            val candidates = if (showEmoji) {
+                CategoryIcons.all
+            } else {
+                CategoryIconCatalog.icons.map { (key, _) -> CategoryIconCatalog.stored(key) }
+            }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                CategoryIcons.all.forEach { candidate ->
+                candidates.forEach { candidate ->
                     val selected = candidate == icon
                     Box(
                         Modifier
@@ -103,7 +131,7 @@ fun CategoryFormSheet(
                             )
                             .clickable { icon = candidate },
                         contentAlignment = Alignment.Center,
-                    ) { Text(candidate, style = MaterialTheme.typography.titleLarge) }
+                    ) { CategoryIcon(candidate, tint = MaterialTheme.colorScheme.onSurface, size = 24) }
                 }
             }
             if (category != null) {

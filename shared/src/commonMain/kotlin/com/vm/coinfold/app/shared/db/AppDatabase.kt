@@ -12,6 +12,7 @@ import com.vm.coinfold.app.feature.currency.db.entities.RateEntity
 import com.vm.coinfold.app.feature.expenses.db.daos.CategoryDao
 import com.vm.coinfold.app.feature.expenses.db.daos.ExpenseStatsDao
 import com.vm.coinfold.app.feature.expenses.db.entities.CategoryEntity
+import com.vm.coinfold.app.feature.overview.db.daos.OverviewDao
 import com.vm.coinfold.app.feature.transactions.db.daos.TransactionDao
 import com.vm.coinfold.app.feature.transactions.db.entities.TransactionEntity
 import com.vm.coinfold.app.shared.db.converters.Converters
@@ -27,6 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun accountDao(): AccountDao
     abstract fun categoryDao(): CategoryDao
     abstract fun expenseStatsDao(): ExpenseStatsDao
+    abstract fun overviewDao(): OverviewDao
     abstract fun transactionDao(): TransactionDao
     abstract fun rateDao(): RateDao
 }

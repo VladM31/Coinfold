@@ -15,12 +15,12 @@ data class DefaultCategory(val name: StringResource, val color: Long, val icon: 
 
 /** Categories created on the very first launch; the user can rename or remove them freely. */
 val DefaultCategories: List<DefaultCategory> = listOf(
-    DefaultCategory(Res.string.cat_groceries, 0xFF8BC34A, "🛒"),
-    DefaultCategory(Res.string.cat_dining, 0xFFFF7043, "🍔"),
-    DefaultCategory(Res.string.cat_transport, 0xFF29B6F6, "🚌"),
-    DefaultCategory(Res.string.cat_home, 0xFF7C4DFF, "🏠"),
-    DefaultCategory(Res.string.cat_health, 0xFFE91E63, "💊"),
-    DefaultCategory(Res.string.cat_entertainment, 0xFFAB47BC, "🎬"),
-    DefaultCategory(Res.string.cat_clothes, 0xFFFFB300, "👕"),
-    DefaultCategory(Res.string.cat_other, 0xFF78909C, "📦"),
+    DefaultCategory(Res.string.cat_groceries, 0xFF8BC34A, "icon:cart"),
+    DefaultCategory(Res.string.cat_dining, 0xFFFF7043, "icon:restaurant"),
+    DefaultCategory(Res.string.cat_transport, 0xFF29B6F6, "icon:bus"),
+    DefaultCategory(Res.string.cat_home, 0xFF7C4DFF, "icon:home"),
+    DefaultCategory(Res.string.cat_health, 0xFFE91E63, "icon:medication"),
+    DefaultCategory(Res.string.cat_entertainment, 0xFFAB47BC, "icon:movie"),
+    DefaultCategory(Res.string.cat_clothes, 0xFFFFB300, "icon:clothes"),
+    DefaultCategory(Res.string.cat_other, 0xFF78909C, "icon:other"),
 )

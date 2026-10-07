@@ -36,7 +36,7 @@ import com.vm.coinfold.app.feature.expenses.ui.components.AddExpenseSheet
 import com.vm.coinfold.app.feature.expenses.ui.components.CategoryFormSheet
 import com.vm.coinfold.app.feature.expenses.ui.components.CategoryRow
 import com.vm.coinfold.app.feature.expenses.ui.components.GRID_COLUMNS
-import com.vm.coinfold.app.feature.expenses.ui.components.PeriodSwitcher
+import com.vm.coinfold.app.shared.ui.components.PeriodSwitcher
 import com.vm.coinfold.app.feature.expenses.ui.components.SummaryRing
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -69,7 +69,15 @@ private fun ExpensesContent(state: ExpensesState, onIntent: (ExpensesIntent) -> 
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            state.period?.let { period -> item { PeriodSwitcher(period, onIntent) } }
+            state.period?.let { period ->
+                item {
+                    PeriodSwitcher(
+                        period = period,
+                        onPrevious = { onIntent(ExpensesIntent.PreviousPeriod) },
+                        onNext = { onIntent(ExpensesIntent.NextPeriod) },
+                    )
+                }
+            }
             state.summary?.let { summary -> item { SummaryRing(summary) } }
             // Categories as a grid of circles, the last cell is the "add" button.
             val cells = state.summary?.perCategory.orEmpty()

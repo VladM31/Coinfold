@@ -44,6 +44,7 @@ import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.feature.transactions.domain.models.PeriodFilter
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionFilter
 import com.vm.coinfold.app.shared.domain.models.TransactionType
+import com.vm.coinfold.app.shared.ui.components.CategoryIcon
 import com.vm.coinfold.app.shared.ui.components.DateField
 import com.vm.coinfold.app.utils.today
 import kotlinx.datetime.DateTimeUnit
@@ -123,7 +124,7 @@ fun FilterSheet(
             Section(stringResource(Res.string.filter_category)) {
                 Chip(stringResource(Res.string.filter_all), categoryId == null) { categoryId = null }
                 categories.forEach {
-                    Chip("${it.icon} ${it.name}", categoryId == it.id) { categoryId = it.id }
+                    Chip(it.name, categoryId == it.id, icon = it.icon) { categoryId = it.id }
                 }
             }
 
@@ -152,6 +153,13 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun Chip(label: String, selected: Boolean, onClick: () -> Unit) {
-    FilterChip(selected = selected, onClick = onClick, label = { Text(label) })
+private fun Chip(label: String, selected: Boolean, icon: String? = null, onClick: () -> Unit) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = { Text(label) },
+        leadingIcon = icon?.let {
+            { CategoryIcon(it, tint = MaterialTheme.colorScheme.onSurfaceVariant, size = 18) }
+        },
+    )
 }

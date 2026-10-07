@@ -2,8 +2,8 @@
     <string name="app_name">Coinfold</string>
     <string name="nav_accounts">Рахунки</string>
     <string name="nav_expenses">Витрати</string>
-    <string name="nav_transactions">Транзакції</string>
-    <string name="nav_settings">Налаштування</string>
+    <string name="nav_transactions">Історія</string>
+    <string name="nav_settings">Опції</string>
 
     <!-- Common -->
     <string name="action_save">Зберегти</string>
@@ -49,6 +49,8 @@
     <string name="category_add">Додати</string>
     <string name="category_new_title">Нова категорія</string>
     <string name="category_edit_title">Редагувати категорію</string>
+    <string name="category_icon_tab_icons">Іконки</string>
+    <string name="category_icon_tab_emoji">Емодзі</string>
     <string name="category_icon">Іконка</string>
     <string name="category_move_earlier">Раніше</string>
     <string name="category_move_later">Пізніше</string>
@@ -116,4 +118,16 @@
     <string name="cat_entertainment">Розваги</string>
     <string name="cat_clothes">Одяг</string>
     <string name="cat_other">Інше</string>
+
+    <!-- Overview -->
+    <string name="nav_overview">Огляд</string>
+    <string name="overview_balance">Баланс</string>
+    <string name="overview_expenses">Витрати</string>
+    <string name="overview_income">Надходження</string>
+    <string name="overview_day_avg">День (серед.)</string>
+    <string name="overview_week_avg">Тиждень (серед.)</string>
+    <string name="overview_month_avg">Місяць (серед.)</string>
+    <string name="overview_by_category">За категоріями</string>
+    <string name="overview_other">Інше</string>
+    <string name="overview_no_expenses">У цьому періоді немає витрат</string>
 </resources>
