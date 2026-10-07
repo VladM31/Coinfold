@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -16,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.vm.coinfold.app.config.Route
+import com.vm.coinfold.app.feature.currency.main.CurrencyRepository
 import com.vm.coinfold.app.feature.settings.main.Settings
 import com.vm.coinfold.app.feature.settings.main.SettingsRepository
 import com.vm.coinfold.app.feature.settings.main.ThemeMode
@@ -26,6 +28,10 @@ import org.koin.compose.koinInject
 
 @Composable
 fun App() {
+    // Refresh exchange rates on start; the repository throttles to once per 5 minutes.
+    val currencyRepository = koinInject<CurrencyRepository>()
+    LaunchedEffect(Unit) { currencyRepository.refresh() }
+
     val settings by koinInject<SettingsRepository>().settings.collectAsState(initial = Settings())
     val darkTheme = when (settings.theme) {
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
