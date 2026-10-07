@@ -5,4 +5,40 @@
     <string name="nav_transactions">Транзакції</string>
     <string name="nav_settings">Налаштування</string>
     <string name="placeholder_coming_soon">Незабаром</string>
+
+    <!-- Common -->
+    <string name="action_save">Зберегти</string>
+    <string name="action_cancel">Скасувати</string>
+    <string name="action_delete">Видалити</string>
+    <string name="field_name">Назва</string>
+    <string name="field_currency">Валюта</string>
+    <string name="field_color">Колір</string>
+    <string name="field_amount">Сума</string>
+    <string name="field_date">Дата</string>
+    <string name="field_note">Примітка</string>
+
+    <!-- Accounts -->
+    <string name="accounts_total_balance">Загальний баланс</string>
+    <string name="accounts_rates_missing">Деякі рахунки не враховано: ще немає курсів валют</string>
+    <string name="accounts_empty">Ще немає рахунків. Додайте перший рахунок.</string>
+    <string name="accounts_add">Додати рахунок</string>
+    <string name="accounts_new_title">Новий рахунок</string>
+    <string name="accounts_edit_title">Редагувати рахунок</string>
+    <string name="accounts_initial_balance">Початковий баланс</string>
+    <string name="accounts_currency_locked">Валюту не можна змінити, якщо на рахунку є транзакції</string>
+    <string name="accounts_delete_title">Видалити рахунок?</string>
+    <string name="accounts_delete_message">Рахунок буде видалено.</string>
+    <string name="accounts_delete_message_archive">На рахунку є транзакції, тому його буде архівовано замість видалення.</string>
+    <string name="accounts_deleted">Рахунок видалено</string>
+    <string name="accounts_archived">Рахунок архівовано</string>
+    <string name="accounts_top_up">Поповнити</string>
+    <string name="accounts_withdraw">Списати</string>
+    <string name="accounts_top_up_title">Поповнення: %1$s</string>
+    <string name="accounts_withdraw_title">Списання: %1$s</string>
+    <string name="accounts_source">Джерело</string>
+    <string name="accounts_source_custom">Або введіть своє джерело</string>
+    <string name="source_salary">Зарплата</string>
+    <string name="source_debt_return">Повернення боргу</string>
+    <string name="source_gift">Подарунок</string>
+    <string name="source_other">Інше</string>
 </resources>

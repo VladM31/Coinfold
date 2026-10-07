@@ -5,4 +5,40 @@
     <string name="nav_transactions">Transactions</string>
     <string name="nav_settings">Settings</string>
     <string name="placeholder_coming_soon">Coming soon</string>
+
+    <!-- Common -->
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="field_name">Name</string>
+    <string name="field_currency">Currency</string>
+    <string name="field_color">Color</string>
+    <string name="field_amount">Amount</string>
+    <string name="field_date">Date</string>
+    <string name="field_note">Note</string>
+
+    <!-- Accounts -->
+    <string name="accounts_total_balance">Total balance</string>
+    <string name="accounts_rates_missing">Some accounts are not included: no exchange rates yet</string>
+    <string name="accounts_empty">No accounts yet. Add your first account.</string>
+    <string name="accounts_add">Add account</string>
+    <string name="accounts_new_title">New account</string>
+    <string name="accounts_edit_title">Edit account</string>
+    <string name="accounts_initial_balance">Initial balance</string>
+    <string name="accounts_currency_locked">Currency cannot be changed once the account has transactions</string>
+    <string name="accounts_delete_title">Delete account?</string>
+    <string name="accounts_delete_message">The account will be deleted.</string>
+    <string name="accounts_delete_message_archive">The account has transactions, so it will be archived instead of deleted.</string>
+    <string name="accounts_deleted">Account deleted</string>
+    <string name="accounts_archived">Account archived</string>
+    <string name="accounts_top_up">Top up</string>
+    <string name="accounts_withdraw">Withdraw</string>
+    <string name="accounts_top_up_title">Top up %1$s</string>
+    <string name="accounts_withdraw_title">Withdraw from %1$s</string>
+    <string name="accounts_source">Source</string>
+    <string name="accounts_source_custom">Or enter your own source</string>
+    <string name="source_salary">Salary</string>
+    <string name="source_debt_return">Debt return</string>
+    <string name="source_gift">Gift</string>
+    <string name="source_other">Other</string>
 </resources>

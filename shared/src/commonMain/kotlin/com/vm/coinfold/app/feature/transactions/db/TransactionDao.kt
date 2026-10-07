@@ -23,6 +23,14 @@ interface TransactionDao {
     @Query("SELECT COUNT(*) FROM transactions WHERE categoryId = :categoryId")
     suspend fun countForCategory(categoryId: Long): Int
 
+    /** Custom (user-defined) income sources used so far; presets are stored with the "preset:" prefix. */
+    @Query(
+        "SELECT DISTINCT incomeSource FROM transactions " +
+            "WHERE type = 'INCOME' AND incomeSource IS NOT NULL AND incomeSource NOT LIKE 'preset:%' " +
+            "ORDER BY incomeSource",
+    )
+    fun observeCustomIncomeSources(): Flow<List<String>>
+
     @Insert
     suspend fun insert(transaction: TransactionEntity): Long
 

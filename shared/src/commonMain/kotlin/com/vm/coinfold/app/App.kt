@@ -8,20 +8,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.intl.Locale
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.vm.coinfold.app.config.Route
+import com.vm.coinfold.app.feature.accounts.ui.AccountsScreen
 import com.vm.coinfold.app.feature.currency.main.CurrencyRepository
+import com.vm.coinfold.app.feature.settings.main.AppLanguage
 import com.vm.coinfold.app.feature.settings.main.Settings
 import com.vm.coinfold.app.feature.settings.main.SettingsRepository
 import com.vm.coinfold.app.feature.settings.main.ThemeMode
+import com.vm.coinfold.app.shared.domain.ResolvedLanguage
 import com.vm.coinfold.app.shared.ui.ComingSoon
+import com.vm.coinfold.app.shared.ui.LocalAppLanguage
 import com.vm.coinfold.app.shared.ui.theme.CoinfoldTheme
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -38,6 +44,13 @@ fun App() {
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
     }
+    // Number/date formats follow the chosen language; "system" resolves to uk or falls back to en.
+    val language = when (settings.language) {
+        AppLanguage.EN -> ResolvedLanguage.EN
+        AppLanguage.UK -> ResolvedLanguage.UK
+        AppLanguage.SYSTEM -> if (Locale.current.language == "uk") ResolvedLanguage.UK else ResolvedLanguage.EN
+    }
+    CompositionLocalProvider(LocalAppLanguage provides language) {
     CoinfoldTheme(darkTheme = darkTheme) {
         val navController = rememberNavController()
         val backStack by navController.currentBackStackEntryAsState()
@@ -65,9 +78,15 @@ fun App() {
         ) { padding ->
             NavHost(navController, startDestination = Route.Expenses.path, modifier = Modifier.padding(padding)) {
                 Route.entries.forEach { route ->
-                    composable(route.path) { ComingSoon(stringResource(route.label)) }
+                    composable(route.path) {
+                        when (route) {
+                            Route.Accounts -> AccountsScreen()
+                            else -> ComingSoon(stringResource(route.label))
+                        }
+                    }
                 }
             }
         }
+    }
     }
 }
