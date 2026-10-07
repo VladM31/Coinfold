@@ -155,7 +155,4 @@ The unit tests live in `shared/src/commonTest` and cover the parts where mistake
 
 Not part of the first version: transfers between accounts, budgets per category, recurring transactions, CSV export, backup and sync, charts by month, PIN and biometrics.
 
-## Notes
 
-- `docs/image-prompts.md` has prompts for generating the app icon, store graphics and illustrations.
-- `docs/phone-adb-notes.md` explains how the app was installed and checked on a real phone with ADB.
