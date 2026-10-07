@@ -13,4 +13,7 @@ interface SettingsRepository {
     suspend fun setMainCurrency(currency: Currency)
     suspend fun setPeriodStartDay(day: Int)
     suspend fun setLastUsedCurrency(currency: Currency)
+
+    /** True only on the first call ever; used to create the default categories once. */
+    suspend fun markCategoriesSeeded(): Boolean
 }

@@ -106,4 +106,14 @@
     <string name="settings_rates_refresh">Оновити</string>
     <string name="settings_rates_updated">Курси оновлено</string>
     <string name="settings_rates_not_updated">Курси не оновлено (немає мережі або оновлено менш ніж 5 хвилин тому)</string>
+
+    <!-- Default categories -->
+    <string name="cat_groceries">Продукти</string>
+    <string name="cat_dining">Кафе</string>
+    <string name="cat_transport">Транспорт</string>
+    <string name="cat_home">Дім</string>
+    <string name="cat_health">Медицина</string>
+    <string name="cat_entertainment">Розваги</string>
+    <string name="cat_clothes">Одяг</string>
+    <string name="cat_other">Інше</string>
 </resources>

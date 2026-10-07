@@ -19,6 +19,7 @@ class SettingsRepositoryImpl(private val storage: SettingsStorage) : SettingsRep
     override suspend fun setMainCurrency(currency: Currency) = storage.setMainCurrency(currency.code)
     override suspend fun setPeriodStartDay(day: Int) = storage.setPeriodStartDay(day.coerceIn(1, 28))
     override suspend fun setLastUsedCurrency(currency: Currency) = storage.setLastUsedCurrency(currency.code)
+    override suspend fun markCategoriesSeeded(): Boolean = storage.markCategoriesSeeded()
 }
 
 private fun StoredSettings.toSettings(): Settings {

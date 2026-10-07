@@ -2,6 +2,7 @@ package com.vm.coinfold.app.feature.settings.db.storages
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -37,7 +38,20 @@ class SettingsStorage(private val dataStore: DataStore<Preferences>) {
         dataStore.edit { it[LAST_USED_CURRENCY] = value }
     }
 
+    /** Returns true only the first time it is called, so one-time setup runs exactly once. */
+    suspend fun markCategoriesSeeded(): Boolean {
+        var first = false
+        dataStore.edit {
+            if (it[CATEGORIES_SEEDED] != true) {
+                it[CATEGORIES_SEEDED] = true
+                first = true
+            }
+        }
+        return first
+    }
+
     private companion object {
+        val CATEGORIES_SEEDED = booleanPreferencesKey("categories_seeded")
         val THEME = stringPreferencesKey("theme")
         val LANGUAGE = stringPreferencesKey("language")
         val MAIN_CURRENCY = stringPreferencesKey("main_currency")

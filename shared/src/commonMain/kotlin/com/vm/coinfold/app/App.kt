@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.vm.coinfold.app.config.Route
 import com.vm.coinfold.app.feature.accounts.ui.screens.AccountsScreen
 import com.vm.coinfold.app.feature.currency.domain.repositories.CurrencyRepository
+import com.vm.coinfold.app.feature.expenses.domain.usecases.SeedDefaultCategoriesUseCase
 import com.vm.coinfold.app.feature.expenses.ui.screens.ExpensesScreen
 import com.vm.coinfold.app.feature.settings.domain.models.AppLanguage
 import com.vm.coinfold.app.feature.settings.domain.models.ThemeMode
@@ -41,6 +42,8 @@ fun App() {
     // Refresh exchange rates on start; the repository throttles to once per 5 minutes.
     val currencyRepository = koinInject<CurrencyRepository>()
     LaunchedEffect(Unit) { currencyRepository.refresh() }
+    // First launch only: create the starter categories (the use case guards itself with a flag).
+    val seedCategories = koinInject<SeedDefaultCategoriesUseCase>()
 
     // Wait for the stored settings so the app does not flash the default theme/language.
     val settings = koinInject<SettingsRepository>().settings.collectAsState(initial = null).value ?: return
@@ -61,6 +64,9 @@ fun App() {
         "uk" -> ResolvedLanguage.UK
         else -> ResolvedLanguage.EN
     }
+
+    // Runs after the locale is applied, so the names match the language the user sees.
+    LaunchedEffect(Unit) { seedCategories() }
 
     CompositionLocalProvider(
         LocalAppLocale provides localeTag,
