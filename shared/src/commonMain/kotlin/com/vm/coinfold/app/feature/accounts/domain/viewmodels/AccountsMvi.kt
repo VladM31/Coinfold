@@ -23,15 +23,18 @@ sealed interface AccountsDialog {
     data object AddAccount : AccountsDialog
     data class EditAccount(val item: AccountWithBalance) : AccountsDialog
     data class ConfirmDelete(val item: AccountWithBalance) : AccountsDialog
-    data class Operation(val item: AccountWithBalance, val type: TransactionType) : AccountsDialog
+    /** The calculator sheet for topping up / withdrawing from one account. */
+    data class Operation(val item: AccountWithBalance) : AccountsDialog
 }
 
 sealed interface AccountsIntent {
     data object AddAccountClicked : AccountsIntent
+    /** Tap on an account: opens the calculator sheet. */
+    data class AccountClicked(val item: AccountWithBalance) : AccountsIntent
+
+    /** Long press on an account: opens the form with name, icon, color and currency. */
     data class EditAccountClicked(val item: AccountWithBalance) : AccountsIntent
     data class DeleteAccountClicked(val item: AccountWithBalance) : AccountsIntent
-    data class TopUpClicked(val item: AccountWithBalance) : AccountsIntent
-    data class WithdrawClicked(val item: AccountWithBalance) : AccountsIntent
     data object DismissDialog : AccountsIntent
     data object ConfirmDelete : AccountsIntent
     data class MainCurrencySelected(val currency: Currency) : AccountsIntent
@@ -41,9 +44,11 @@ sealed interface AccountsIntent {
         val currency: Currency,
         val initialBalance: BigDecimal,
         val color: Long?,
+        val icon: String?,
     ) : AccountsIntent
 
     data class SaveOperation(
+        val type: TransactionType,
         val amount: BigDecimal,
         val source: IncomeSource?,
         val note: String,

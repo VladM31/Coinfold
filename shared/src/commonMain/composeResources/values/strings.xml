@@ -142,4 +142,8 @@
     <string name="expense_amount_label">Expense</string>
     <string name="expense_notes">Notes…</string>
     <string name="date_today">Today</string>
+
+    <!-- Account sheet -->
+    <string name="accounts_operation_label">Operation</string>
+    <string name="accounts_balance_after">Balance after</string>
 </resources>

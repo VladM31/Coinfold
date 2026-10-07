@@ -38,9 +38,9 @@ import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsEffect
 import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsIntent
 import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsState
 import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsViewModel
-import com.vm.coinfold.app.feature.accounts.ui.components.AccountCard
 import com.vm.coinfold.app.feature.accounts.ui.components.AccountFormSheet
-import com.vm.coinfold.app.feature.accounts.ui.components.OperationSheet
+import com.vm.coinfold.app.feature.accounts.ui.components.AccountListItem
+import com.vm.coinfold.app.feature.accounts.ui.components.AccountOperationSheet
 import com.vm.coinfold.app.feature.accounts.ui.components.TotalCard
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -95,7 +95,11 @@ private fun AccountsContent(
                 }
             }
             items(state.accounts, key = { it.account.id }) { item ->
-                AccountCard(item, onIntent)
+                AccountListItem(
+                    item = item,
+                    onClick = { onIntent(AccountsIntent.AccountClicked(item)) },
+                    onLongClick = { onIntent(AccountsIntent.EditAccountClicked(item)) },
+                )
             }
         }
     }
@@ -110,26 +114,25 @@ private fun AccountDialogs(state: AccountsState, onIntent: (AccountsIntent) -> U
         null -> Unit
         AccountsDialog.AddAccount -> AccountFormSheet(
             item = null,
-            onSave = { name, currency, initial, color ->
-                onIntent(AccountsIntent.SaveAccount(null, name, currency, initial, color))
+            onSave = { name, currency, initial, color, icon ->
+                onIntent(AccountsIntent.SaveAccount(null, name, currency, initial, color, icon))
             },
             onDelete = null,
             onDismiss = dismiss,
         )
         is AccountsDialog.EditAccount -> AccountFormSheet(
             item = dialog.item,
-            onSave = { name, currency, initial, color ->
-                onIntent(AccountsIntent.SaveAccount(dialog.item.account.id, name, currency, initial, color))
+            onSave = { name, currency, initial, color, icon ->
+                onIntent(AccountsIntent.SaveAccount(dialog.item.account.id, name, currency, initial, color, icon))
             },
             onDelete = { onIntent(AccountsIntent.DeleteAccountClicked(dialog.item)) },
             onDismiss = dismiss,
         )
-        is AccountsDialog.Operation -> OperationSheet(
+        is AccountsDialog.Operation -> AccountOperationSheet(
             item = dialog.item,
-            type = dialog.type,
             customSources = state.customSources,
-            onSave = { amount, source, note, date ->
-                onIntent(AccountsIntent.SaveOperation(amount, source, note, date))
+            onSave = { type, amount, source, note, date ->
+                onIntent(AccountsIntent.SaveOperation(type, amount, source, note, date))
             },
             onDismiss = dismiss,
         )

@@ -39,7 +39,7 @@ fun IncomeSource.displayName(): String = when (this) {
 
 /**
  * Chips with the preset and previously used custom sources plus a field for a new one.
- * [customText] wins over [selected] while it is not blank.
+ * The own-source field appears only for "Other"; [customText] wins over [selected] while it is not blank.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -57,19 +57,22 @@ fun IncomeSourcePicker(
             val options = IncomeSource.Preset.entries + customSources.map { IncomeSource.Custom(it) }
             options.forEach { option ->
                 FilterChip(
-                    selected = customText.isBlank() && selected == option,
+                    selected = selected == option,
                     onClick = { onSelected(option); onCustomTextChange("") },
                     label = { Text(option.displayName()) },
                 )
             }
         }
-        OutlinedTextField(
-            value = customText,
-            onValueChange = onCustomTextChange,
-            label = { Text(stringResource(Res.string.accounts_source_custom)) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        // The free-text field is only offered when "Other" is chosen; picking any other chip hides and clears it.
+        if (selected == IncomeSource.Preset.OTHER) {
+            OutlinedTextField(
+                value = customText,
+                onValueChange = onCustomTextChange,
+                label = { Text(stringResource(Res.string.accounts_source_custom)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 

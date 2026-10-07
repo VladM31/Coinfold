@@ -29,7 +29,6 @@ class AccountRepositoryImpl(private val dao: AccountDao) : AccountRepository {
                 draft.toEntity(draft.id).copy(
                     currency = currency,
                     initialBalanceMinor = draft.initialBalance.minorUnits,
-                    icon = existing.icon,
                 ),
             )
         }
@@ -51,6 +50,7 @@ private fun AccountDraft.toEntity(id: Long) = AccountEntity(
     currency = currency,
     initialBalanceMinor = initialBalance.minorUnits,
     color = color,
+    icon = icon,
 )
 
 private fun AccountRow.toModel(): AccountWithBalance {

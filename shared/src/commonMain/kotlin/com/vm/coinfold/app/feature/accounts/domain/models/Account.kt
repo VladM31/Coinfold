@@ -27,6 +27,8 @@ data class AccountDraft(
     val currency: Currency,
     val initialBalance: Money,
     val color: Long?,
+    /** Stored icon (see CategoryIconCatalog): `icon:<key>` or an emoji; null shows the default. */
+    val icon: String? = null,
 )
 
 enum class DeleteResult { DELETED, ARCHIVED }

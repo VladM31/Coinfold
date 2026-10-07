@@ -38,6 +38,7 @@ import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.shared.ui.components.CategoryIcon
 import com.vm.coinfold.app.shared.ui.components.LocalAppLanguage
+import com.vm.coinfold.app.shared.ui.components.SheetHeaderHalf
 import com.vm.coinfold.app.utils.format
 import org.jetbrains.compose.resources.stringResource
 
@@ -59,7 +60,7 @@ fun ExpenseSheetHeader(
 
     Row(modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
         Box(Modifier.weight(1f).background(MaterialTheme.colorScheme.primary)) {
-            HeaderHalf(
+            SheetHeaderHalf(
                 label = stringResource(Res.string.expense_from_account),
                 title = selectedAccount?.account?.name.orEmpty(),
                 modifier = Modifier.clickable(enabled = accounts.size > 1) { menuOpen = true },
@@ -83,39 +84,9 @@ fun ExpenseSheetHeader(
             }
         }
         Box(Modifier.weight(1f).background(categoryColor)) {
-            HeaderHalf(label = stringResource(Res.string.expense_to_category), title = category.name) {
+            SheetHeaderHalf(label = stringResource(Res.string.expense_to_category), title = category.name) {
                 CategoryIcon(category.icon, tint = categoryColor, size = 24)
             }
         }
-    }
-}
-
-@Composable
-private fun HeaderHalf(
-    label: String,
-    title: String,
-    modifier: Modifier = Modifier,
-    badge: @Composable () -> Unit,
-) {
-    Row(
-        modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text(label, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.85f))
-            Text(
-                title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Medium,
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        Box(
-            Modifier.size(40.dp).clip(CircleShape).background(Color.White),
-            contentAlignment = Alignment.Center,
-        ) { badge() }
     }
 }

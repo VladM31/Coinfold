@@ -142,4 +142,8 @@
     <string name="expense_amount_label">Витрата</string>
     <string name="expense_notes">Нотатки…</string>
     <string name="date_today">Сьогодні</string>
+
+    <!-- Account sheet -->
+    <string name="accounts_operation_label">Операція</string>
+    <string name="accounts_balance_after">Баланс після</string>
 </resources>

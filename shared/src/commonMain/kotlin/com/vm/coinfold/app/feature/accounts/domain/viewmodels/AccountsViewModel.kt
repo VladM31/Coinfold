@@ -14,7 +14,6 @@ import com.vm.coinfold.app.feature.settings.domain.repositories.SettingsReposito
 import com.vm.coinfold.app.feature.transactions.domain.repositories.TransactionRepository
 import com.vm.coinfold.app.feature.transactions.domain.usecases.AddManualTransactionUseCase
 import com.vm.coinfold.app.shared.domain.models.Money
-import com.vm.coinfold.app.shared.domain.models.TransactionType
 import com.vm.coinfold.app.utils.epochMillisFor
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,10 +58,7 @@ class AccountsViewModel(
             AccountsIntent.AddAccountClicked -> dialog.value = AccountsDialog.AddAccount
             is AccountsIntent.EditAccountClicked -> dialog.value = AccountsDialog.EditAccount(intent.item)
             is AccountsIntent.DeleteAccountClicked -> dialog.value = AccountsDialog.ConfirmDelete(intent.item)
-            is AccountsIntent.TopUpClicked ->
-                dialog.value = AccountsDialog.Operation(intent.item, TransactionType.INCOME)
-            is AccountsIntent.WithdrawClicked ->
-                dialog.value = AccountsDialog.Operation(intent.item, TransactionType.EXPENSE)
+            is AccountsIntent.AccountClicked -> dialog.value = AccountsDialog.Operation(intent.item)
             AccountsIntent.DismissDialog -> dialog.value = null
             is AccountsIntent.MainCurrencySelected ->
                 viewModelScope.launch { settingsRepository.setMainCurrency(intent.currency) }
@@ -83,6 +79,7 @@ class AccountsViewModel(
                     currency = intent.currency,
                     initialBalance = Money.of(intent.initialBalance, intent.currency),
                     color = intent.color,
+                    icon = intent.icon,
                 ),
             )
             dialog.value = null
@@ -109,7 +106,7 @@ class AccountsViewModel(
         if (amount.minorUnits <= 0) return
         viewModelScope.launch {
             addManualTransaction(
-                type = operation.type,
+                type = intent.type,
                 accountId = account.id,
                 amount = amount,
                 source = intent.source,

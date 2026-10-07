@@ -1,4 +1,4 @@
-package com.vm.coinfold.app.feature.expenses.ui.components
+package com.vm.coinfold.app.shared.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -32,18 +32,19 @@ private val KEY_HEIGHT = 56.dp
 private val KEY_GAP = 6.dp
 
 /**
- * Calculator keypad of the expense sheet. Five columns: operators, three digit columns and an action
+ * Calculator keypad shared by the expense and account sheets. Five columns: operators, three digit columns and an action
  * column (backspace, date, big confirm button). The bottom-left digit key shows the current currency
  * and cycles UAH, USD, EUR when pressed.
  */
 @Composable
-fun ExpenseKeypad(
+fun CalculatorKeypad(
     currency: Currency,
     accent: Color,
     confirmEnabled: Boolean,
     onKey: (Char) -> Unit,
     onBackspace: () -> Unit,
-    onCurrencyClick: () -> Unit,
+    /** Null makes the currency key a plain label (used when the currency is fixed, e.g. an account). */
+    onCurrencyClick: (() -> Unit)?,
     onDateClick: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
@@ -58,7 +59,7 @@ fun ExpenseKeypad(
             TextKey("7") { onKey('7') }
             TextKey("4") { onKey('4') }
             TextKey("1") { onKey('1') }
-            TextKey(currency.code, emphasized = true, onClick = onCurrencyClick)
+            TextKey(currency.code, emphasized = true, enabled = onCurrencyClick != null) { onCurrencyClick?.invoke() }
         }
         KeyColumn(Modifier.weight(1f)) {
             TextKey("8") { onKey('8') }
@@ -97,8 +98,8 @@ private fun KeyColumn(modifier: Modifier, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun TextKey(label: String, emphasized: Boolean = false, onClick: () -> Unit) {
-    Key(emphasized, onClick) {
+private fun TextKey(label: String, emphasized: Boolean = false, enabled: Boolean = true, onClick: () -> Unit) {
+    Key(emphasized, onClick, enabled) {
         Text(
             label,
             style = if (label.length > 1) MaterialTheme.typography.titleMedium else MaterialTheme.typography.headlineSmall,
@@ -112,9 +113,10 @@ private fun IconKey(icon: ImageVector, onClick: () -> Unit) {
 }
 
 @Composable
-private fun Key(emphasized: Boolean, onClick: () -> Unit, content: @Composable () -> Unit) {
+private fun Key(emphasized: Boolean, onClick: () -> Unit, enabled: Boolean = true, content: @Composable () -> Unit) {
     Surface(
         onClick = onClick,
+        enabled = enabled,
         shape = RoundedCornerShape(14.dp),
         color = if (emphasized) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),

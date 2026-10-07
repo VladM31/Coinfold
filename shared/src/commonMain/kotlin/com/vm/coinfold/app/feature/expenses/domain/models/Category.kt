@@ -9,13 +9,8 @@ data class Category(
     val icon: String,
 )
 
-/** Built-in icon set (emoji render the same on Android and iOS and need no extra assets). */
+/** Icon defaults; the pickable icons live in the shared UI (vector catalog and emoji set). */
 object CategoryIcons {
-    val all: List<String> = listOf(
-        "🛒", "🍔", "☕", "🚌", "🚗", "🏠",
-        "💡", "📱", "🎬", "👕", "💊", "🎁",
-        "✈️", "🐾", "🎓", "🏋️", "💼", "📦",
-    )
     /** Default for new categories: the shopping cart from the vector catalog (stored as `icon:<key>`). */
     const val default: String = "icon:cart"
 }

@@ -1,6 +1,9 @@
-package com.vm.coinfold.app.feature.expenses.ui.components
+package com.vm.coinfold.app.feature.accounts.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -33,20 +36,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
+import coinfold.shared.generated.resources.accounts_balance_after
+import coinfold.shared.generated.resources.accounts_operation_label
+import coinfold.shared.generated.resources.accounts_top_up
+import coinfold.shared.generated.resources.accounts_withdraw
 import coinfold.shared.generated.resources.date_today
-import coinfold.shared.generated.resources.expense_amount_label
-import coinfold.shared.generated.resources.expense_no_accounts
+import coinfold.shared.generated.resources.expense_account
 import coinfold.shared.generated.resources.expense_notes
-import coinfold.shared.generated.resources.expense_withdrawal
+import coinfold.shared.generated.resources.field_amount
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
-import com.vm.coinfold.app.feature.currency.domain.models.RateTable
-import com.vm.coinfold.app.feature.expenses.domain.models.Category
-import com.vm.coinfold.app.shared.domain.models.Currency
+import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.Money
+import com.vm.coinfold.app.shared.domain.models.TransactionType
 import com.vm.coinfold.app.shared.ui.components.CalculatorKeypad
+import com.vm.coinfold.app.shared.ui.components.CategoryIcon
 import com.vm.coinfold.app.shared.ui.components.DatePickerDialogHost
+import com.vm.coinfold.app.shared.ui.components.IncomeSourcePicker
 import com.vm.coinfold.app.shared.ui.components.LocalAppLanguage
+import com.vm.coinfold.app.shared.ui.components.SheetHeaderHalf
+import com.vm.coinfold.app.shared.ui.components.resolveSource
+import com.vm.coinfold.app.shared.ui.theme.IncomeGreen
 import com.vm.coinfold.app.utils.Calculator
 import com.vm.coinfold.app.utils.CalculatorInput
 import com.vm.coinfold.app.utils.OP_DIVIDE
@@ -61,40 +71,38 @@ import org.jetbrains.compose.resources.stringResource
 private const val OPERATORS = "$OP_PLUS$OP_MINUS$OP_TIMES$OP_DIVIDE"
 
 /**
- * Bottom sheet opened from a category circle. Only what is needed to record an expense: the amount
- * (with a calculator), its currency, the account and an optional note; the date is one key away.
+ * Calculator sheet opened by tapping an account: the same keypad as the expense sheet, plus a switch between
+ * topping up (with a source) and withdrawing. The amount is always in the currency of the account.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddExpenseSheet(
-    category: Category,
-    accounts: List<AccountWithBalance>,
-    rates: RateTable,
-    initialCurrency: Currency,
-    onSave: (amount: BigDecimal, currency: Currency, accountId: Long, note: String, date: LocalDate) -> Unit,
+fun AccountOperationSheet(
+    item: AccountWithBalance,
+    customSources: List<String>,
+    onSave: (type: TransactionType, amount: BigDecimal, source: IncomeSource?, note: String, date: LocalDate) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val language = LocalAppLanguage.current
+    val account = item.account
+    var type by remember { mutableStateOf(TransactionType.INCOME) }
     var expression by remember { mutableStateOf("") }
-    var currency by remember { mutableStateOf(initialCurrency) }
-    var accountId by remember { mutableStateOf(accounts.firstOrNull()?.account?.id) }
     var note by remember { mutableStateOf("") }
     var date by remember { mutableStateOf(today()) }
     var datePickerOpen by remember { mutableStateOf(false) }
+    var selectedSource by remember { mutableStateOf<IncomeSource>(IncomeSource.Preset.SALARY) }
+    var customText by remember { mutableStateOf("") }
 
-    val account = accounts.firstOrNull { it.account.id == accountId }
-    val categoryColor = Color(category.color)
+    val isIncome = type == TransactionType.INCOME
+    val accent = if (isIncome) IncomeGreen else MaterialTheme.colorScheme.error
+    val accountColor = Color(account.color ?: DEFAULT_ACCOUNT_COLOR)
 
-    // The typed expression is evaluated live; it is valid only if it gives a positive amount.
     val result = Calculator.evaluate(expression)
-    val entered = result?.let { Money.of(it, currency) }?.takeIf { it.minorUnits > 0 }
-    // What leaves the account: the same amount, or the converted one when the currencies differ.
-    val fromAccount = if (entered != null && account != null) {
-        rates.convert(entered, account.account.currency)?.money
-    } else {
-        null
+    val entered = result?.let { Money.of(it, account.currency) }?.takeIf { it.minorUnits > 0 }
+    val balanceAfter = when {
+        entered == null -> item.balance
+        isIncome -> item.balance + entered
+        else -> item.balance - entered
     }
-    val canSave = entered != null && fromAccount != null && account != null
     val hasOperator = expression.drop(1).any { it in OPERATORS }
 
     ModalBottomSheet(
@@ -103,21 +111,29 @@ fun AddExpenseSheet(
         dragHandle = null,
     ) {
         Column(Modifier.navigationBarsPadding().verticalScroll(rememberScrollState())) {
-            if (accounts.isEmpty()) {
-                Text(
-                    stringResource(Res.string.expense_no_accounts),
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(24.dp),
-                )
-                return@Column
+            // Left: the account. Right: the operation; tap it to switch between top-up and withdrawal.
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+                Box(Modifier.weight(1f).background(accountColor)) {
+                    SheetHeaderHalf(label = stringResource(Res.string.expense_account), title = account.name) {
+                        CategoryIcon(account.icon ?: DEFAULT_ACCOUNT_ICON, tint = accountColor, size = 24)
+                    }
+                }
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .background(accent)
+                        .clickable {
+                            type = if (isIncome) TransactionType.EXPENSE else TransactionType.INCOME
+                        },
+                ) {
+                    SheetHeaderHalf(
+                        label = stringResource(Res.string.accounts_operation_label),
+                        title = stringResource(if (isIncome) Res.string.accounts_top_up else Res.string.accounts_withdraw),
+                    ) {
+                        Text(if (isIncome) "+" else "−", style = MaterialTheme.typography.titleLarge, color = accent)
+                    }
+                }
             }
-
-            ExpenseSheetHeader(
-                accounts = accounts,
-                selectedAccount = account,
-                category = category,
-                onAccountSelected = { accountId = it.account.id },
-            )
 
             Column(
                 Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
@@ -128,20 +144,30 @@ fun AddExpenseSheet(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     AmountCard(
-                        label = stringResource(Res.string.expense_withdrawal),
-                        value = fromAccount?.format(language) ?: "—",
+                        label = stringResource(Res.string.accounts_balance_after),
+                        value = balanceAfter.format(language),
                         subtitle = null,
                         container = MaterialTheme.colorScheme.primaryContainer,
                         content = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                     )
                     AmountCard(
-                        label = stringResource(Res.string.expense_amount_label),
-                        value = "${expression.ifEmpty { "0" }} ${currency.code}",
+                        label = stringResource(Res.string.field_amount),
+                        value = "${expression.ifEmpty { "0" }} ${account.currency.code}",
                         subtitle = if (hasOperator && entered != null) "= ${entered.format(language)}" else null,
-                        container = categoryColor.copy(alpha = 0.16f),
-                        content = categoryColor,
+                        container = accent.copy(alpha = 0.16f),
+                        content = accent,
                         modifier = Modifier.weight(1f).fillMaxHeight(),
+                    )
+                }
+
+                if (isIncome) {
+                    IncomeSourcePicker(
+                        selected = selectedSource,
+                        customText = customText,
+                        customSources = customSources,
+                        onSelected = { selectedSource = it },
+                        onCustomTextChange = { customText = it },
                     )
                 }
 
@@ -155,16 +181,19 @@ fun AddExpenseSheet(
                 )
 
                 CalculatorKeypad(
-                    currency = currency,
-                    accent = categoryColor,
-                    confirmEnabled = canSave,
+                    currency = account.currency,
+                    accent = accent,
+                    confirmEnabled = entered != null,
                     onKey = { expression = CalculatorInput.append(expression, it) },
                     onBackspace = { expression = CalculatorInput.backspace(expression) },
-                    onCurrencyClick = { currency = Currency.entries[(currency.ordinal + 1) % Currency.entries.size] },
+                    // The currency of an account is fixed, so the key is just a label here.
+                    onCurrencyClick = null,
                     onDateClick = { datePickerOpen = true },
                     onConfirm = {
-                        val id = accountId
-                        if (result != null && id != null) onSave(result, currency, id, note, date)
+                        if (result != null) {
+                            val source = if (isIncome) resolveSource(selectedSource, customText) else null
+                            onSave(type, result, source, note, date)
+                        }
                     },
                 )
 
