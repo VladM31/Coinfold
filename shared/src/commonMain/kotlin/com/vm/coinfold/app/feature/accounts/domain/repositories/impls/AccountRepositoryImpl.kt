@@ -34,14 +34,22 @@ class AccountRepositoryImpl(private val dao: AccountDao) : AccountRepository {
         }
     }
 
-    override suspend fun delete(id: Long): DeleteResult =
-        if (dao.countTransactions(id) > 0) {
-            dao.archive(id)
-            DeleteResult.ARCHIVED
-        } else {
-            dao.delete(id)
-            DeleteResult.DELETED
-        }
+    /** What the last [delete] did, kept in memory so it can be undone right after. */
+    private var lastDelete: Pair<AccountEntity, Boolean>? = null
+
+    override suspend fun delete(id: Long): DeleteResult {
+        val entity = dao.getById(id)
+        val archive = dao.countTransactions(id) > 0
+        if (archive) dao.archive(id) else dao.delete(id)
+        if (entity != null) lastDelete = entity to archive
+        return if (archive) DeleteResult.ARCHIVED else DeleteResult.DELETED
+    }
+
+    override suspend fun undoDelete() {
+        val (entity, archived) = lastDelete ?: return
+        lastDelete = null
+        if (archived) dao.unarchive(entity.id) else dao.insert(entity)
+    }
 }
 
 private fun AccountDraft.toEntity(id: Long) = AccountEntity(

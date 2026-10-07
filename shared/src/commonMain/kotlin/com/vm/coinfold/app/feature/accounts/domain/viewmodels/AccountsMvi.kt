@@ -37,6 +37,7 @@ sealed interface AccountsIntent {
     data class DeleteAccountClicked(val item: AccountWithBalance) : AccountsIntent
     data object DismissDialog : AccountsIntent
     data object ConfirmDelete : AccountsIntent
+    data object UndoDelete : AccountsIntent
     data class MainCurrencySelected(val currency: Currency) : AccountsIntent
     data class SaveAccount(
         val id: Long?,
@@ -58,4 +59,7 @@ sealed interface AccountsIntent {
 
 sealed interface AccountsEffect {
     data class ShowMessage(val message: StringResource) : AccountsEffect
+
+    /** A message with an "Undo" action that sends [AccountsIntent.UndoDelete]. */
+    data class ShowUndo(val message: StringResource) : AccountsEffect
 }

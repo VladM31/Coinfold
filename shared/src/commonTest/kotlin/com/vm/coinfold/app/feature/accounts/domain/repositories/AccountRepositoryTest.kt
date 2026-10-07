@@ -35,6 +35,7 @@ class AccountRepositoryTest {
         }
         override suspend fun update(account: AccountEntity) { stored[account.id] = account }
         override suspend fun archive(id: Long) { archived += id }
+        override suspend fun unarchive(id: Long) { archived -= id }
         override suspend fun delete(id: Long) { deleted += id }
     }
 
@@ -78,5 +79,30 @@ class AccountRepositoryTest {
         assertEquals("Renamed", saved.name)
         assertEquals(500, saved.initialBalanceMinor)
         assertNull(saved.color)
+    }
+
+    @Test
+    fun undoDeleteUnarchivesAnArchivedAccount() = runTest {
+        val dao = FakeDao(txCount = 2)
+        dao.stored[1] = AccountEntity(1, "Card", Currency.UAH, 0)
+        val repo = AccountRepositoryImpl(dao)
+
+        repo.delete(1)
+        assertEquals(listOf(1L), dao.archived)
+        repo.undoDelete()
+
+        assertEquals(emptyList(), dao.archived)
+    }
+
+    @Test
+    fun undoDeleteReinsertsADeletedAccount() = runTest {
+        val dao = FakeDao(txCount = 0)
+        dao.stored[1] = AccountEntity(1, "Card", Currency.UAH, 500)
+        val repo = AccountRepositoryImpl(dao)
+
+        repo.delete(1)
+        repo.undoDelete()
+
+        assertEquals("Card", dao.stored.values.single { it.initialBalanceMinor == 500L }.name)
     }
 }

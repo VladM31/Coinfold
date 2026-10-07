@@ -50,6 +50,11 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.koin.android)
+            // file sharing/picking for backups and exports
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.activity.compose)
+            // fingerprint / face unlock
+            implementation(libs.androidx.biometric)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)

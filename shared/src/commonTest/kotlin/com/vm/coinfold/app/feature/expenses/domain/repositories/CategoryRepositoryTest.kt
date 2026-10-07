@@ -24,8 +24,12 @@ class CategoryRepositoryTest {
         override suspend fun archive(id: Long) {
             all.value = all.value.map { if (it.id == id) it.copy(isArchived = true) else it }
         }
+        override suspend fun unarchive(id: Long) {
+            all.value = all.value.map { if (it.id == id) it.copy(isArchived = false) else it }
+        }
         override suspend fun insert(category: CategoryEntity): Long {
-            val id = (all.value.maxOfOrNull { it.id } ?: 0) + 1
+            // like Room: a non-zero id is kept, zero means "generate one"
+            val id = category.id.takeIf { it != 0L } ?: ((all.value.maxOfOrNull { it.id } ?: 0) + 1)
             all.value = all.value + category.copy(id = id)
             return id
         }
@@ -75,5 +79,38 @@ class CategoryRepositoryTest {
         val empty = FakeDao(listOf(category(1, 0)))
         assertEquals(CategoryDeleteResult.DELETED, CategoryRepositoryImpl(empty).delete(1))
         assertEquals(emptyList(), empty.all.value)
+    }
+
+    @Test
+    fun undoDeleteBringsTheCategoryBackInPlace() = runTest {
+        val dao = FakeDao(listOf(category(1, 0), category(2, 1), category(3, 2)))
+        val repo = CategoryRepositoryImpl(dao)
+
+        repo.delete(2)
+        assertEquals(listOf(1L, 3L), repo.ids())
+        repo.undoDelete()
+
+        // restored with the same id and sort order, so it returns to its old position
+        assertEquals(listOf(1L, 2L, 3L), repo.ids())
+    }
+
+    @Test
+    fun undoDeleteUnarchivesACategoryWithExpenses() = runTest {
+        val dao = FakeDao(listOf(category(1, 0)), txCount = 2)
+        val repo = CategoryRepositoryImpl(dao)
+
+        repo.delete(1)
+        assertEquals(emptyList(), repo.ids())
+        repo.undoDelete()
+
+        assertEquals(listOf(1L), repo.ids())
+    }
+
+    @Test
+    fun undoWithoutAPreviousDeleteDoesNothing() = runTest {
+        val dao = FakeDao(listOf(category(1, 0)))
+        val repo = CategoryRepositoryImpl(dao)
+        repo.undoDelete()
+        assertEquals(listOf(1L), repo.ids())
     }
 }

@@ -18,13 +18,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.accounts_rates_missing
 import coinfold.shared.generated.resources.overview_balance
 import coinfold.shared.generated.resources.overview_expenses
 import coinfold.shared.generated.resources.overview_income
+import coinfold.shared.generated.resources.overview_vs_less
+import coinfold.shared.generated.resources.overview_vs_less_days
+import coinfold.shared.generated.resources.overview_vs_more
+import coinfold.shared.generated.resources.overview_vs_more_days
+import coinfold.shared.generated.resources.overview_vs_same
 import com.vm.coinfold.app.feature.overview.domain.models.OverviewSummary
+import com.vm.coinfold.app.feature.overview.domain.models.PeriodComparison
 import com.vm.coinfold.app.shared.ui.components.LocalAppLanguage
 import com.vm.coinfold.app.shared.ui.theme.IncomeGreen
 import com.vm.coinfold.app.utils.format
@@ -61,6 +68,7 @@ fun BalanceHeader(summary: OverviewSummary, modifier: Modifier = Modifier) {
                 modifier = Modifier.weight(1f).fillMaxHeight(),
             )
         }
+        ComparisonLine(summary.comparison)
         if (summary.hasMissingRates) {
             Text(
                 stringResource(Res.string.accounts_rates_missing),
@@ -86,4 +94,32 @@ private fun AmountCard(label: String, value: String, container: Color, content: 
             Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         }
     }
+}
+
+/** "Spending is 12% higher than in the previous period": red when higher, green when lower. */
+@Composable
+private fun ComparisonLine(comparison: PeriodComparison) {
+    val change = comparison.spentChangePercent ?: return
+    val text = when {
+        change == 0 -> stringResource(Res.string.overview_vs_same)
+        change > 0 -> stringResource(
+            if (comparison.sameDaysOnly) Res.string.overview_vs_more_days else Res.string.overview_vs_more,
+            "$change%",
+        )
+        else -> stringResource(
+            if (comparison.sameDaysOnly) Res.string.overview_vs_less_days else Res.string.overview_vs_less,
+            "${-change}%",
+        )
+    }
+    Text(
+        text,
+        style = MaterialTheme.typography.bodyMedium,
+        textAlign = TextAlign.Center,
+        color = when {
+            change > 0 -> MaterialTheme.colorScheme.error
+            change < 0 -> IncomeGreen
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        modifier = Modifier.fillMaxWidth(),
+    )
 }

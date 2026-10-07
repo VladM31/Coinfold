@@ -33,6 +33,8 @@ val dataModule = module {
     single { get<AppDatabase>().categoryDao() }
     single { get<AppDatabase>().expenseStatsDao() }
     single { get<AppDatabase>().overviewDao() }
+    single { get<AppDatabase>().recurringDao() }
+    single { get<AppDatabase>().backupDao() }
     single { get<AppDatabase>().transactionDao() }
     single { get<AppDatabase>().rateDao() }
 

@@ -1,13 +1,14 @@
 package com.vm.coinfold.app
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.fragment.app.FragmentActivity
 
-class MainActivity : ComponentActivity() {
+// FragmentActivity (a ComponentActivity subclass) is what BiometricPrompt requires.
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)

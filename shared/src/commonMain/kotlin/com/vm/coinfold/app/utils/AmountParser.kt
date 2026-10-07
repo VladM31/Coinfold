@@ -15,3 +15,13 @@ fun parseAmount(text: String, allowNegative: Boolean = false): BigDecimal? {
     if (!regex.matches(cleaned)) return null
     return BigDecimal.parseString(cleaned.replace(',', '.'))
 }
+
+private val RATE = Regex("""\d+([.,]\d{1,6})?""")
+
+/** Parses an exchange rate typed by the user (up to 6 decimals); null if invalid or not positive. */
+fun parseRate(text: String): BigDecimal? {
+    val cleaned = text.trim().filterNot { it.isWhitespace() }
+    if (!RATE.matches(cleaned)) return null
+    val value = BigDecimal.parseString(cleaned.replace(',', '.'))
+    return value.takeIf { it > BigDecimal.ZERO }
+}

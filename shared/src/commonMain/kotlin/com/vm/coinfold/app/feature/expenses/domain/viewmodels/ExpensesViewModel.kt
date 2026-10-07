@@ -18,6 +18,7 @@ import com.vm.coinfold.app.feature.expenses.domain.services.calculateSummary
 import com.vm.coinfold.app.feature.settings.domain.models.Settings
 import com.vm.coinfold.app.feature.settings.domain.repositories.SettingsRepository
 import com.vm.coinfold.app.feature.transactions.domain.models.AddExpenseResult
+import com.vm.coinfold.app.feature.transactions.domain.repositories.TransactionRepository
 import com.vm.coinfold.app.feature.transactions.domain.usecases.AddExpenseUseCase
 import com.vm.coinfold.app.shared.domain.models.Money
 import com.vm.coinfold.app.shared.domain.models.Period
@@ -52,6 +53,7 @@ class ExpensesViewModel(
     private val settingsRepository: SettingsRepository,
     currencyRepository: CurrencyRepository,
     accountRepository: AccountRepository,
+    transactionRepository: TransactionRepository,
     private val addExpense: AddExpenseUseCase,
 ) : ViewModel() {
 
@@ -79,7 +81,8 @@ class ExpensesViewModel(
         periodData,
         accountRepository.accounts,
         dialog,
-    ) { data, accounts, dialog ->
+        transactionRepository.noteSuggestions,
+    ) { data, accounts, dialog, suggestions ->
         ExpensesState(
             isLoading = false,
             period = data.period,
@@ -89,6 +92,7 @@ class ExpensesViewModel(
             accounts = accounts,
             lastUsedCurrency = data.settings.lastUsedCurrency,
             rates = data.rates,
+            noteSuggestions = suggestions,
             dialog = dialog,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ExpensesState())
@@ -104,6 +108,7 @@ class ExpensesViewModel(
             is ExpensesIntent.SaveCategory -> saveCategory(intent)
             is ExpensesIntent.DeleteCategoryClicked -> dialog.value = ExpensesDialog.ConfirmDeleteCategory(intent.category)
             ExpensesIntent.ConfirmDeleteCategory -> confirmDelete()
+            ExpensesIntent.UndoDeleteCategory -> viewModelScope.launch { categoryRepository.undoDelete() }
             is ExpensesIntent.ReorderCategories ->
                 viewModelScope.launch { categoryRepository.reorder(intent.ids) }
             is ExpensesIntent.SaveExpense -> saveExpense(intent)
@@ -127,12 +132,13 @@ class ExpensesViewModel(
                 CategoryDeleteResult.DELETED -> Res.string.category_deleted
                 CategoryDeleteResult.ARCHIVED -> Res.string.category_archived
             }
-            effects.send(ExpensesEffect.ShowMessage(message))
+            effects.send(ExpensesEffect.ShowUndo(message))
         }
     }
 
     private fun saveExpense(intent: ExpensesIntent.SaveExpense) {
-        val category = (dialog.value as? ExpensesDialog.AddExpense)?.category ?: return
+        // The sheet may have switched to another category after a suggestion; it must still exist.
+        val category = state.value.categories.firstOrNull { it.id == intent.categoryId } ?: return
         val account = state.value.accounts.firstOrNull { it.account.id == intent.accountId }?.account ?: return
         val amount = Money.of(intent.amount, intent.currency)
         if (amount.minorUnits <= 0) return
@@ -144,6 +150,7 @@ class ExpensesViewModel(
                 amount = amount,
                 note = intent.note,
                 dateTime = epochMillisFor(intent.date),
+                rateOverride = intent.rateOverride,
             )
             when (result) {
                 AddExpenseResult.SUCCESS -> {

@@ -12,6 +12,9 @@ interface CategoryRepository {
     /** Deletes the category, or archives it if it already has transactions. */
     suspend fun delete(id: Long): CategoryDeleteResult
 
+    /** Brings back the category removed by the last [delete] (restores it, or un-archives it). */
+    suspend fun undoDelete()
+
     /** Stores the given order (ids of active categories, first = leftmost). */
     suspend fun reorder(ids: List<Long>)
 }

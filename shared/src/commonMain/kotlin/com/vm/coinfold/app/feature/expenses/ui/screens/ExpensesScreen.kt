@@ -37,6 +37,7 @@ import com.vm.coinfold.app.feature.expenses.ui.components.CategoryFormSheet
 import com.vm.coinfold.app.feature.expenses.ui.components.CategoryGrid
 import com.vm.coinfold.app.feature.expenses.ui.components.SummaryRing
 import com.vm.coinfold.app.shared.ui.components.PeriodSwitcher
+import com.vm.coinfold.app.shared.ui.components.showUndo
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -50,6 +51,7 @@ fun ExpensesScreen(viewModel: ExpensesViewModel = koinViewModel()) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is ExpensesEffect.ShowMessage -> snackbar.showSnackbar(getString(effect.message))
+                is ExpensesEffect.ShowUndo -> if (snackbar.showUndo(effect.message)) viewModel.onIntent(ExpensesIntent.UndoDeleteCategory)
             }
         }
     }
@@ -117,10 +119,12 @@ private fun ExpensesDialogs(state: ExpensesState, onIntent: (ExpensesIntent) -> 
         is ExpensesDialog.AddExpense -> AddExpenseSheet(
             category = dialog.category,
             accounts = state.accounts,
+            categories = state.categories,
+            noteSuggestions = state.noteSuggestions,
             rates = state.rates,
             initialCurrency = state.lastUsedCurrency,
-            onSave = { amount, currency, accountId, note, date ->
-                onIntent(ExpensesIntent.SaveExpense(amount, currency, accountId, note, date))
+            onSave = { amount, currency, accountId, categoryId, note, date, rate ->
+                onIntent(ExpensesIntent.SaveExpense(amount, currency, accountId, categoryId, note, date, rate))
             },
             onDismiss = dismiss,
         )

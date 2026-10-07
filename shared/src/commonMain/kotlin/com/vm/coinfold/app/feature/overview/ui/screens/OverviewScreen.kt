@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.overview_by_category
 import coinfold.shared.generated.resources.overview_no_expenses
+import coinfold.shared.generated.resources.overview_trend_title
 import com.vm.coinfold.app.feature.overview.domain.viewmodels.OverviewIntent
 import com.vm.coinfold.app.feature.overview.domain.viewmodels.OverviewState
 import com.vm.coinfold.app.feature.overview.domain.viewmodels.OverviewViewModel
@@ -26,6 +27,7 @@ import com.vm.coinfold.app.feature.overview.ui.components.AverageCards
 import com.vm.coinfold.app.feature.overview.ui.components.BalanceHeader
 import com.vm.coinfold.app.feature.overview.ui.components.CategoryShareRow
 import com.vm.coinfold.app.feature.overview.ui.components.DailyBarChart
+import com.vm.coinfold.app.feature.overview.ui.components.MonthlyTrendChart
 import com.vm.coinfold.app.shared.ui.components.PeriodSwitcher
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -56,6 +58,10 @@ private fun OverviewContent(state: OverviewState, onIntent: (OverviewIntent) -> 
         item { BalanceHeader(summary) }
         item { DailyBarChart(summary.bars) }
         item { AverageCards(summary) }
+        item {
+            Text(stringResource(Res.string.overview_trend_title), style = MaterialTheme.typography.titleMedium)
+        }
+        item { MonthlyTrendChart(summary.trend) }
 
         if (summary.shares.isEmpty()) {
             item {

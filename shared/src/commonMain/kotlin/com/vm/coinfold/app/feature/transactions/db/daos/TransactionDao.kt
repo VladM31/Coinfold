@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.vm.coinfold.app.feature.transactions.db.entities.NoteStatRow
 import com.vm.coinfold.app.feature.transactions.db.entities.TransactionEntity
 import com.vm.coinfold.app.feature.transactions.db.entities.TransactionRow
 import kotlinx.coroutines.flow.Flow
@@ -54,6 +55,13 @@ interface TransactionDao {
             "ORDER BY incomeSource",
     )
     fun observeCustomIncomeSources(): Flow<List<String>>
+
+    /** Past notes with their category and usage count, most used first; the source of the suggestions. */
+    @Query(
+        "SELECT note, categoryId, COUNT(*) AS uses, MAX(dateTime) AS lastUsed FROM transactions " +
+            "WHERE note != '' GROUP BY note, categoryId ORDER BY uses DESC, lastUsed DESC LIMIT 500",
+    )
+    fun observeNoteStats(): Flow<List<NoteStatRow>>
 
     @Insert
     suspend fun insert(transaction: TransactionEntity): Long

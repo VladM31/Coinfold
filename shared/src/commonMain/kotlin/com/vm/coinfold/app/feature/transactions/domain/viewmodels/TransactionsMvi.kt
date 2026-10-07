@@ -38,6 +38,8 @@ sealed interface TransactionsIntent {
     data class ItemClicked(val item: TransactionItem) : TransactionsIntent
     data class DeleteClicked(val item: TransactionItem) : TransactionsIntent
     data object ConfirmDelete : TransactionsIntent
+    data object UndoDelete : TransactionsIntent
+    data class DuplicateClicked(val item: TransactionItem) : TransactionsIntent
     data object DismissDialog : TransactionsIntent
     data class SaveEdit(
         val amount: BigDecimal,
@@ -47,9 +49,14 @@ sealed interface TransactionsIntent {
         val source: IncomeSource?,
         val note: String,
         val date: LocalDate,
+        /** A rate typed for this transaction, or null to keep/derive it. */
+        val rateOverride: BigDecimal? = null,
     ) : TransactionsIntent
 }
 
 sealed interface TransactionsEffect {
     data class ShowMessage(val message: StringResource) : TransactionsEffect
+
+    /** A message with an "Undo" action that sends [TransactionsIntent.UndoDelete]. */
+    data class ShowUndo(val message: StringResource) : TransactionsEffect
 }

@@ -1,6 +1,7 @@
 package com.vm.coinfold.app.feature.transactions.domain.repositories
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.vm.coinfold.app.feature.transactions.domain.models.NoteSuggestion
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionItem
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionQuery
 import com.vm.coinfold.app.shared.domain.models.IncomeSource
@@ -11,6 +12,9 @@ import kotlinx.coroutines.flow.Flow
 interface TransactionRepository {
     /** Names of custom income sources the user has entered before. */
     val customIncomeSources: Flow<List<String>>
+
+    /** Notes used before with their categories, for autocomplete and category suggestions. */
+    val noteSuggestions: Flow<List<NoteSuggestion>>
 
     /**
      * Adds a top-up (INCOME, with [source]) or a manual withdrawal (EXPENSE without category).
@@ -54,4 +58,10 @@ interface TransactionRepository {
     )
 
     suspend fun delete(id: Long)
+
+    /** Brings back the transaction removed by the last [delete]. */
+    suspend fun undoDelete()
+
+    /** Copies a transaction (same amount, rate, account, category, source and note) with a new date. */
+    suspend fun duplicate(id: Long, dateTime: Long): Boolean
 }

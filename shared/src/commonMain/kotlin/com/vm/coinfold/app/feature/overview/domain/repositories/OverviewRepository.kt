@@ -8,6 +8,6 @@ interface OverviewRepository {
     /** All transactions inside [period], oldest first. */
     fun observeTransactions(period: Period): Flow<List<OverviewTransaction>>
 
-    /** Every expense ever recorded. */
-    fun observeAllExpenses(): Flow<List<OverviewTransaction>>
+    /** Every income and expense ever recorded. */
+    fun observeAllTransactions(): Flow<List<OverviewTransaction>>
 }

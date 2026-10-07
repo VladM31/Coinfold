@@ -42,6 +42,7 @@ import com.vm.coinfold.app.feature.accounts.ui.components.AccountFormSheet
 import com.vm.coinfold.app.feature.accounts.ui.components.AccountListItem
 import com.vm.coinfold.app.feature.accounts.ui.components.AccountOperationSheet
 import com.vm.coinfold.app.feature.accounts.ui.components.TotalCard
+import com.vm.coinfold.app.shared.ui.components.showUndo
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -55,6 +56,7 @@ fun AccountsScreen(viewModel: AccountsViewModel = koinViewModel()) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is AccountsEffect.ShowMessage -> snackbar.showSnackbar(getString(effect.message))
+                is AccountsEffect.ShowUndo -> if (snackbar.showUndo(effect.message)) viewModel.onIntent(AccountsIntent.UndoDelete)
             }
         }
     }

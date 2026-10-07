@@ -53,4 +53,15 @@ class FormattingTest {
     fun formatsDate() {
         assertEquals("05.03.2026", LocalDate(2026, 3, 5).format())
     }
+
+    @Test
+    fun parsesRates() {
+        assertEquals(BigDecimal.parseString("41.2534"), parseRate("41,2534"))
+        assertEquals(BigDecimal.parseString("0.025"), parseRate("0.025"))
+        assertNull(parseRate("0"))
+        assertNull(parseRate("-3"))
+        assertNull(parseRate("1.1234567")) // more than 6 decimals
+        assertNull(parseRate("abc"))
+        assertNull(parseRate(""))
+    }
 }

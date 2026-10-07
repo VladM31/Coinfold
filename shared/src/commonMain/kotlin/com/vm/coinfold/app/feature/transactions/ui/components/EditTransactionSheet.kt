@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.action_delete
+import coinfold.shared.generated.resources.action_duplicate
 import coinfold.shared.generated.resources.action_save
 import coinfold.shared.generated.resources.expense_account
 import coinfold.shared.generated.resources.field_amount
@@ -49,9 +50,12 @@ import com.vm.coinfold.app.shared.domain.models.TransactionType
 import com.vm.coinfold.app.shared.ui.components.CategoryIcon
 import com.vm.coinfold.app.shared.ui.components.CurrencySelector
 import com.vm.coinfold.app.shared.ui.components.DateField
+import com.vm.coinfold.app.shared.ui.components.ExchangeRateDialog
 import com.vm.coinfold.app.shared.ui.components.IncomeSourcePicker
+import com.vm.coinfold.app.shared.ui.components.RateSettingsButton
 import com.vm.coinfold.app.shared.ui.components.resolveSource
 import com.vm.coinfold.app.utils.parseAmount
+import com.vm.coinfold.app.utils.parseRate
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
@@ -80,8 +84,10 @@ fun EditTransactionSheet(
         source: IncomeSource?,
         note: String,
         date: LocalDate,
+        rateOverride: BigDecimal?,
     ) -> Unit,
     onDelete: () -> Unit,
+    onDuplicate: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val isIncome = item.type == TransactionType.INCOME
@@ -106,11 +112,18 @@ fun EditTransactionSheet(
     }
     var selectedSource by remember { mutableStateOf(item.source ?: IncomeSource.Preset.OTHER) }
     var customText by remember { mutableStateOf("") }
+    // Exchange rate of this one transaction; only shown when the currency differs from the account.
+    var rateText by remember {
+        mutableStateOf(if (item.amount.currency != item.accountCurrency) item.rate.toPlainString() else "")
+    }
 
     val accountCurrency = accountOptions.first { it.id == accountId }.currency
     val shownCurrency = if (isCategorized) currency else accountCurrency
     val amountValue = parseAmount(amount)
-    val canSave = amountValue != null && amountValue > BigDecimal.ZERO
+    var rateDialogOpen by remember { mutableStateOf(false) }
+    val crossCurrency = shownCurrency != accountCurrency
+    val rateValue = if (crossCurrency) parseRate(rateText) else null
+    val canSave = amountValue != null && amountValue > BigDecimal.ZERO && (!crossCurrency || rateValue != null)
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
@@ -143,6 +156,7 @@ fun EditTransactionSheet(
                 TextButton(onClick = onDelete) {
                     Text(stringResource(Res.string.action_delete), color = MaterialTheme.colorScheme.error)
                 }
+                TextButton(onClick = onDuplicate) { Text(stringResource(Res.string.action_duplicate)) }
                 Button(
                     enabled = canSave,
                     onClick = {
@@ -155,6 +169,7 @@ fun EditTransactionSheet(
                                 if (isIncome) resolveSource(selectedSource, customText) else null,
                                 note,
                                 date,
+                                rateValue,
                             )
                         }
                     },
@@ -163,7 +178,7 @@ fun EditTransactionSheet(
             }
             if (isCategorized) {
                 Text(stringResource(Res.string.field_currency), style = MaterialTheme.typography.labelLarge)
-                CurrencySelector(currency, onSelected = { currency = it })
+                CurrencySelector(currency, onSelected = { currency = it; rateText = "" })
 
                 Text(stringResource(Res.string.filter_category), style = MaterialTheme.typography.labelLarge)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -194,7 +209,7 @@ fun EditTransactionSheet(
                 accountOptions.forEach { option ->
                     FilterChip(
                         selected = accountId == option.id,
-                        onClick = { accountId = option.id },
+                        onClick = { accountId = option.id; rateText = "" },
                         label = { Text("${option.name} · ${option.currency.code}") },
                     )
                 }
@@ -210,9 +225,34 @@ fun EditTransactionSheet(
                 )
             }
 
-            DateField(date, onDateChange = { date = it })
+            // The date on the left, the exchange rate of this transaction (a quiet button) on the right.
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                DateField(date, onDateChange = { date = it })
+                if (crossCurrency) {
+                    RateSettingsButton(customRate = rateText, onClick = { rateDialogOpen = true })
+                }
+            }
 
             Spacer(Modifier.height(16.dp))
         }
+    }
+
+    if (rateDialogOpen) {
+        ExchangeRateDialog(
+            fromCode = shownCurrency.code,
+            toCode = accountCurrency.code,
+            // the rate stored with the transaction, shown as the reference
+            bankRate = item.rate.toPlainString().takeIf { item.amount.currency != item.accountCurrency },
+            current = rateText,
+            onConfirm = {
+                rateText = it
+                rateDialogOpen = false
+            },
+            onDismiss = { rateDialogOpen = false },
+        )
     }
 }

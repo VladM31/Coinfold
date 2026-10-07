@@ -24,6 +24,9 @@ interface CategoryDao {
     @Query("UPDATE categories SET isArchived = 1 WHERE id = :id")
     suspend fun archive(id: Long)
 
+    @Query("UPDATE categories SET isArchived = 0 WHERE id = :id")
+    suspend fun unarchive(id: Long)
+
     @Insert
     suspend fun insert(category: CategoryEntity): Long
 

@@ -34,6 +34,26 @@ The look is violet and white: mostly white in the light theme, deep violet-tinte
 - Edit or delete a transaction; balances are recalculated automatically. Editing keeps the stored exchange rate as long as the currency pair does not change.
 - Paged list, so scrolling stays smooth with a long history.
 
+### Recurring payments
+- Subscriptions, rent, salary: a schedule (daily, weekly, monthly, yearly) creates the transactions automatically when the app starts or comes to the front. Missed occurrences are created with their own dates.
+- Manage them in Settings; each schedule can be paused, edited or deleted (with Undo).
+
+### Backup and export
+- **Backup** is one JSON file with all accounts, categories, transactions, recurring payments and settings. It is portable between Android and iOS. Restoring validates the file first and replaces the data in a single database transaction, so a bad file never changes anything.
+- **Export** transactions for all time, the current or the previous period as **CSV** (opens in Excel/Sheets, Cyrillic-safe) or as a printable **PDF** report (Android only for now).
+- Files go through the system share sheet, so you can save them to a cloud drive or send them anywhere.
+
+### Quality of life
+- **Undo** after deleting a transaction, account, category or recurring payment; **Duplicate** a transaction in one tap.
+- **Suggestions** in the expense sheet: earlier notes while you type, and a category suggestion ("Silpo" was Groceries before).
+- **Manual exchange rate** for a single operation, behind a quiet button under the date; it also works when no bank rate was ever loaded.
+- **Comparison with the previous period** and a 12-period income/expense chart on the Overview screen.
+
+### Security
+- Optional **4-digit PIN lock** (Settings). The app asks for the PIN on start and when you return after more than 30 seconds away. The PIN is stored only as a salted, iterated SHA-256 hash; after repeated wrong tries entry is blocked for 30 seconds, 5 minutes, then an hour.
+- **Fingerprint / face unlock** where the device has it (Android BiometricPrompt, iOS LocalAuthentication); the PIN is always the fallback.
+- While a PIN is set the app is hidden in the recent-apps list and screenshots are blocked on Android (`FLAG_SECURE`), and a cover is drawn whenever the app is not in the foreground. The PIN is not part of backups.
+
 ### Settings
 - Theme: system, light or dark.
 - Language: **English or Ukrainian**, applied immediately without restarting. By default it follows the system language, falling back to English.
@@ -153,6 +173,6 @@ The unit tests live in `shared/src/commonTest` and cover the parts where mistake
 
 ## Roadmap
 
-Not part of the first version: transfers between accounts, budgets per category, recurring transactions, CSV export, backup and sync, charts by month, PIN and biometrics.
+Not done yet: transfers between accounts, budgets per category, sync, quick-entry widget and voice input, onboarding, accessibility polish, PDF export on iOS.
 
 

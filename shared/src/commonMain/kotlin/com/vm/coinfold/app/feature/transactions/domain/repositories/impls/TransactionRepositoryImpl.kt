@@ -4,6 +4,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.transactions.db.daos.TransactionDao
 import com.vm.coinfold.app.feature.transactions.db.entities.TransactionEntity
 import com.vm.coinfold.app.feature.transactions.db.entities.TransactionRow
+import com.vm.coinfold.app.feature.transactions.domain.models.NoteSuggestion
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionCategory
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionItem
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionQuery
@@ -17,6 +18,10 @@ import kotlinx.coroutines.flow.map
 class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRepository {
 
     override val customIncomeSources: Flow<List<String>> = dao.observeCustomIncomeSources()
+
+    override val noteSuggestions: Flow<List<NoteSuggestion>> = dao.observeNoteStats().map { rows ->
+        rows.map { NoteSuggestion(it.note, it.categoryId, it.uses, it.lastUsed) }
+    }
 
     override suspend fun addManual(
         type: TransactionType,
@@ -107,7 +112,26 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         )
     }
 
-    override suspend fun delete(id: Long) = dao.delete(id)
+    /** The last deleted transaction, kept in memory so the delete can be undone right after. */
+    private var lastDeleted: TransactionEntity? = null
+
+    override suspend fun delete(id: Long) {
+        lastDeleted = dao.getById(id)
+        dao.delete(id)
+    }
+
+    override suspend fun undoDelete() {
+        val entity = lastDeleted ?: return
+        lastDeleted = null
+        // The account or category may have been removed in the meantime; then there is nothing to restore into.
+        runCatching { dao.insert(entity) }
+    }
+
+    override suspend fun duplicate(id: Long, dateTime: Long): Boolean {
+        val original = dao.getById(id) ?: return false
+        dao.insert(original.copy(id = 0, dateTime = dateTime))
+        return true
+    }
 }
 
 private fun TransactionRow.toItem(): TransactionItem {

@@ -11,4 +11,7 @@ interface AccountRepository {
 
     /** Deletes the account, or archives it if it already has transactions. */
     suspend fun delete(id: Long): DeleteResult
+
+    /** Brings back the account removed by the last [delete] (restores it, or un-archives it). */
+    suspend fun undoDelete()
 }

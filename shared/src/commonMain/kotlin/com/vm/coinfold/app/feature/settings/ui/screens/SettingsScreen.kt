@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -24,17 +25,27 @@ import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.language_en
 import coinfold.shared.generated.resources.language_system
 import coinfold.shared.generated.resources.language_uk
+import coinfold.shared.generated.resources.settings_backup
+import coinfold.shared.generated.resources.settings_backup_hint
 import coinfold.shared.generated.resources.settings_language
 import coinfold.shared.generated.resources.settings_main_currency
 import coinfold.shared.generated.resources.settings_main_currency_hint
 import coinfold.shared.generated.resources.settings_period_hint
 import coinfold.shared.generated.resources.settings_period_start
 import coinfold.shared.generated.resources.settings_rates
+import coinfold.shared.generated.resources.settings_recurring
+import coinfold.shared.generated.resources.settings_recurring_hint
+import coinfold.shared.generated.resources.settings_recurring_open
 import coinfold.shared.generated.resources.settings_theme
 import coinfold.shared.generated.resources.settings_title
 import coinfold.shared.generated.resources.theme_dark
 import coinfold.shared.generated.resources.theme_light
 import coinfold.shared.generated.resources.theme_system
+import com.vm.coinfold.app.feature.security.domain.viewmodels.SecurityIntent
+import com.vm.coinfold.app.feature.security.domain.viewmodels.SecurityState
+import com.vm.coinfold.app.feature.security.domain.viewmodels.SecurityViewModel
+import com.vm.coinfold.app.feature.security.ui.components.PinDialog
+import com.vm.coinfold.app.feature.security.ui.components.SecuritySection
 import com.vm.coinfold.app.feature.settings.domain.models.AppLanguage
 import com.vm.coinfold.app.feature.settings.domain.models.ThemeMode
 import com.vm.coinfold.app.feature.settings.domain.viewmodels.SettingsEffect
@@ -45,13 +56,19 @@ import com.vm.coinfold.app.feature.settings.ui.components.OptionChips
 import com.vm.coinfold.app.feature.settings.ui.components.PeriodDayStepper
 import com.vm.coinfold.app.feature.settings.ui.components.RatesStatus
 import com.vm.coinfold.app.feature.settings.ui.components.SettingsSection
+import com.vm.coinfold.app.shared.platform.rememberBiometricAuthenticator
 import com.vm.coinfold.app.shared.ui.components.CurrencySelector
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel = koinViewModel()) {
+fun SettingsScreen(
+    onOpenRecurring: () -> Unit,
+    onOpenBackup: () -> Unit,
+    viewModel: SettingsViewModel = koinViewModel(),
+    securityViewModel: SecurityViewModel = koinViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
 
@@ -63,13 +80,30 @@ fun SettingsScreen(viewModel: SettingsViewModel = koinViewModel()) {
         }
     }
 
-    SettingsContent(state, viewModel::onIntent, snackbar)
+    val security by securityViewModel.state.collectAsStateWithLifecycle()
+    val biometrics = rememberBiometricAuthenticator()
+
+    SettingsContent(
+        state = state,
+        onIntent = viewModel::onIntent,
+        onOpenRecurring = onOpenRecurring,
+        onOpenBackup = onOpenBackup,
+        security = security,
+        biometricAvailable = biometrics.isAvailable,
+        onSecurityIntent = securityViewModel::onIntent,
+        snackbar = snackbar,
+    )
 }
 
 @Composable
 private fun SettingsContent(
     state: SettingsState,
     onIntent: (SettingsIntent) -> Unit,
+    onOpenRecurring: () -> Unit,
+    onOpenBackup: () -> Unit,
+    security: SecurityState,
+    biometricAvailable: Boolean,
+    onSecurityIntent: (SecurityIntent) -> Unit,
     snackbar: SnackbarHostState,
 ) {
     val settings = state.settings
@@ -131,6 +165,29 @@ private fun SettingsContent(
             }
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
+            // Opens the list of scheduled payments (subscriptions, rent, salary).
+            SettingsSection(
+                title = stringResource(Res.string.settings_recurring),
+                hint = stringResource(Res.string.settings_recurring_hint),
+            ) {
+                OutlinedButton(onClick = onOpenRecurring) {
+                    Text(stringResource(Res.string.settings_recurring_open))
+                }
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            SecuritySection(security, biometricAvailable, onSecurityIntent)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            // Backup, restore and export live on their own screen.
+            SettingsSection(
+                title = stringResource(Res.string.settings_backup),
+                hint = stringResource(Res.string.settings_backup_hint),
+            ) {
+                OutlinedButton(onClick = onOpenBackup) { Text(stringResource(Res.string.settings_recurring_open)) }
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
             SettingsSection(stringResource(Res.string.settings_rates)) {
                 RatesStatus(
                     updatedAt = state.ratesUpdatedAt,
@@ -139,5 +196,13 @@ private fun SettingsContent(
                 )
             }
         }
+    }
+    security.dialog?.let { dialog ->
+        PinDialog(
+            state = dialog,
+            onDigit = { onSecurityIntent(SecurityIntent.Digit(it)) },
+            onBackspace = { onSecurityIntent(SecurityIntent.Backspace) },
+            onDismiss = { onSecurityIntent(SecurityIntent.DismissDialog) },
+        )
     }
 }

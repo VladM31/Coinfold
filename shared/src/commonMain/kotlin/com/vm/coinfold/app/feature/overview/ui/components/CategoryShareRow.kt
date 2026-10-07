@@ -21,6 +21,7 @@ import com.vm.coinfold.app.feature.overview.domain.models.CategoryShare
 import com.vm.coinfold.app.shared.ui.components.CategoryBadge
 import com.vm.coinfold.app.shared.ui.components.CategoryIconCatalog
 import com.vm.coinfold.app.shared.ui.components.LocalAppLanguage
+import com.vm.coinfold.app.shared.ui.theme.IncomeGreen
 import com.vm.coinfold.app.utils.format
 import org.jetbrains.compose.resources.stringResource
 
@@ -61,7 +62,19 @@ fun CategoryShareRow(share: CategoryShare, modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.SemiBold,
                     color = color,
                 )
+                share.changePercent?.let { ChangeLabel(it) }
             }
         }
     }
+}
+
+/** "▲ 12%" in red (more spending than before) or "▼ 8%" in green (less); nothing when unchanged. */
+@Composable
+private fun ChangeLabel(change: Int) {
+    if (change == 0) return
+    Text(
+        (if (change > 0) "▲ " else "▼ ") + "${kotlin.math.abs(change)}%",
+        style = MaterialTheme.typography.labelSmall,
+        color = if (change > 0) MaterialTheme.colorScheme.error else IncomeGreen,
+    )
 }

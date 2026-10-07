@@ -1,5 +1,7 @@
 package com.vm.coinfold.app.feature.transactions.domain.usecases
 
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.vm.coinfold.app.feature.currency.domain.models.Conversion
 import com.vm.coinfold.app.feature.currency.domain.usecases.ConvertMoneyUseCase
 import com.vm.coinfold.app.feature.transactions.domain.models.AddExpenseResult
 import com.vm.coinfold.app.feature.transactions.domain.repositories.TransactionRepository
@@ -22,8 +24,14 @@ class AddExpenseUseCase(
         amount: Money,
         note: String,
         dateTime: Long,
+        /** A rate typed by the user for this one expense; used instead of the bank rate when currencies differ. */
+        rateOverride: BigDecimal? = null,
     ): AddExpenseResult {
-        val conversion = convert(amount, accountCurrency) ?: return AddExpenseResult.NO_RATE
+        val conversion = if (rateOverride != null && amount.currency != accountCurrency) {
+            Conversion(amount.convertTo(accountCurrency, rateOverride), rateOverride)
+        } else {
+            convert(amount, accountCurrency) ?: return AddExpenseResult.NO_RATE
+        }
         // A tiny amount may round to zero in the account currency; never store a zero debit.
         val accountAmount = conversion.money.takeIf { it.minorUnits > 0 } ?: Money(1, accountCurrency)
         repository.addExpense(accountId, categoryId, amount, accountAmount, conversion.rate, note, dateTime)

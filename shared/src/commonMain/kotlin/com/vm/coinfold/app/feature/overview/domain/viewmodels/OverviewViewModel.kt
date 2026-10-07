@@ -38,12 +38,17 @@ class OverviewViewModel(
     ) { startDay, offset -> Period.containing(today(), startDay).shiftMonths(offset) }
 
     val state: StateFlow<OverviewState> = combine(
-        period.flatMapLatest { p -> overviewRepository.observeTransactions(p).map { p to it } },
+        period.flatMapLatest { p ->
+            combine(
+                overviewRepository.observeTransactions(p),
+                overviewRepository.observeTransactions(p.shiftMonths(-1)),
+            ) { current, previous -> Triple(p, current, previous) }
+        },
         categoryRepository.categories,
         currencyRepository.rateTable,
         settingsRepository.settings,
-        overviewRepository.observeAllExpenses(),
-    ) { (period, transactions), categories, rates, settings, history ->
+        overviewRepository.observeAllTransactions(),
+    ) { (period, transactions, previous), categories, rates, settings, history ->
         OverviewState(
             isLoading = false,
             period = period,
@@ -57,6 +62,7 @@ class OverviewViewModel(
                 timeZone = TimeZone.currentSystemDefault(),
                 history = history,
                 periodStartDay = settings.periodStartDay,
+                previousTransactions = previous,
             ),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), OverviewState())

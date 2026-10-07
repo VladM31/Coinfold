@@ -146,4 +146,110 @@
     <!-- Account sheet -->
     <string name="accounts_operation_label">Операція</string>
     <string name="accounts_balance_after">Баланс після</string>
+
+    <!-- Undo / duplicate -->
+    <string name="action_undo">Скасувати</string>
+    <string name="action_duplicate">Дублювати</string>
+    <string name="transaction_duplicated">Транзакцію продубльовано на сьогодні</string>
+
+    <!-- Recurring payments -->
+    <string name="settings_recurring">Регулярні платежі</string>
+    <string name="settings_recurring_hint">Підписки, оренда, зарплата: транзакції створюються автоматично за розкладом</string>
+    <string name="settings_recurring_open">Керувати</string>
+    <string name="recurring_title">Регулярні платежі</string>
+    <string name="recurring_empty">Ще немає регулярних платежів. Додайте підписку, оренду або зарплату.</string>
+    <string name="recurring_add">Додати</string>
+    <string name="recurring_new_title">Новий регулярний платіж</string>
+    <string name="recurring_edit_title">Редагувати регулярний платіж</string>
+    <string name="recurring_deleted">Регулярний платіж видалено</string>
+    <string name="recurring_repeat">Повторювати</string>
+    <string name="recurring_first_date">Перша дата</string>
+    <string name="recurring_next">наступний %1$s</string>
+    <string name="freq_daily">Щодня</string>
+    <string name="freq_weekly">Щотижня</string>
+    <string name="freq_monthly">Щомісяця</string>
+    <string name="freq_yearly">Щороку</string>
+
+    <!-- Overview: comparison and trend -->
+    <string name="overview_vs_same">Витрати такі самі, як у попередньому періоді</string>
+    <string name="overview_vs_more">Витрати на %1$s більші, ніж у попередньому періоді</string>
+    <string name="overview_vs_less">Витрати на %1$s менші, ніж у попередньому періоді</string>
+    <string name="overview_vs_more_days">Витрати на %1$s більші, ніж за ті самі дні попереднього періоду</string>
+    <string name="overview_vs_less_days">Витрати на %1$s менші, ніж за ті самі дні попереднього періоду</string>
+    <string name="overview_trend_title">Останні 12 періодів</string>
+    <string name="overview_trend_income">Надходження</string>
+    <string name="overview_trend_expenses">Витрати</string>
+
+    <!-- Manual rate -->
+    <string name="rate_label">Курс: 1 %1$s = … %2$s</string>
+
+    <string name="rate_button_bank">Курс обміну: банку</string>
+    <string name="rate_button_custom">Курс обміну: %1$s</string>
+    <string name="rate_dialog_title">Курс обміну</string>
+    <string name="rate_dialog_hint">Діє лише для цієї операції. Залиште порожнім, щоб використати курс банку.</string>
+    <string name="rate_bank">Курс банку: %1$s</string>
+    <string name="rate_use_bank">Курс банку</string>
+
+    <!-- Backup and export -->
+    <string name="settings_backup">Резервна копія та експорт</string>
+    <string name="settings_backup_hint">Збережіть дані у файл, відновіть їх або експортуйте транзакції в таблицю чи PDF</string>
+    <string name="backup_title">Резервна копія та експорт</string>
+    <string name="backup_section_backup">Резервна копія</string>
+    <string name="backup_section_backup_hint">Копія — це один файл з усіма рахунками, категоріями, транзакціями, регулярними платежами та налаштуваннями. Зберігайте його в надійному місці, наприклад у хмарі. Відновлення замінює все на цьому пристрої.</string>
+    <string name="backup_create">Створити копію</string>
+    <string name="backup_restore">Відновити з файлу</string>
+    <string name="backup_section_export">Експорт транзакцій</string>
+    <string name="backup_section_export_hint">Оберіть період і експортуйте CSV-файл для таблиці або PDF-звіт для друку.</string>
+    <string name="export_range_all">Увесь час</string>
+    <string name="export_range_current">Поточний період</string>
+    <string name="export_range_previous">Попередній період</string>
+    <string name="export_csv">Експорт CSV</string>
+    <string name="export_pdf">Експорт PDF</string>
+    <string name="backup_restore_title">Замінити всі дані?</string>
+    <string name="backup_restore_message">У копії від %1$s: рахунків — %2$s, категорій — %3$s, транзакцій — %4$s, регулярних платежів — %5$s. Усі дані на цьому пристрої буде замінено ними.</string>
+    <string name="backup_restore_confirm">Замінити</string>
+    <string name="backup_restored">Копію відновлено</string>
+    <string name="backup_error_unreadable">Цей файл не є придатною копією</string>
+    <string name="backup_error_not_coinfold">Це не файл резервної копії Coinfold</string>
+    <string name="backup_error_newer">Цю копію створено новішою версією застосунку</string>
+    <string name="backup_error_invalid">У копії є значення, які неможливо завантажити</string>
+    <string name="backup_error_broken">Копія пошкоджена: деякі записи посилаються на відсутні рахунки чи категорії</string>
+    <string name="backup_error_duplicate">У копії є повторювані записи</string>
+    <string name="backup_error_failed">Щось пішло не так. Ваші дані не змінено.</string>
+    <string name="report_title">Coinfold: транзакції</string>
+    <string name="report_generated">створено %1$s</string>
+    <string name="report_income">Надходження</string>
+    <string name="report_expenses">Витрати</string>
+    <string name="report_balance">Баланс</string>
+    <string name="report_count">Транзакцій: %1$s</string>
+    <string name="report_range_all">Увесь час</string>
+    <string name="report_range_current">Поточний період</string>
+    <string name="report_range_previous">Попередній період</string>
+    <string name="report_col_date">Дата</string>
+    <string name="report_col_account">Рахунок</string>
+    <string name="report_col_category">Категорія</string>
+    <string name="report_col_note">Примітка</string>
+    <string name="report_col_amount">Сума</string>
+    <string name="report_col_in_account">На рахунку</string>
+
+    <!-- Security -->
+    <string name="security_title">Безпека</string>
+    <string name="security_hint">Заблокуйте застосунок 4-значним PIN-кодом. Його просять під час відкриття та після пів хвилини відсутності, а ще застосунок ховається у списку недавніх і не дає робити знімки екрана. У резервних копіях PIN не зберігається.</string>
+    <string name="security_set_pin">Встановити PIN</string>
+    <string name="security_pin_on">PIN-код увімкнено</string>
+    <string name="security_change_pin">Змінити PIN</string>
+    <string name="security_turn_off">Вимкнути</string>
+    <string name="security_biometric">Розблокування відбитком або обличчям</string>
+    <string name="pin_current">Введіть поточний PIN</string>
+    <string name="pin_new">Введіть новий PIN</string>
+    <string name="pin_confirm">Повторіть новий PIN</string>
+    <string name="pin_wrong">Неправильний PIN</string>
+    <string name="pin_mismatch">PIN-коди не збіглися. Спробуйте ще раз.</string>
+    <string name="pin_locked">Забагато спроб. Спробуйте пізніше.</string>
+    <string name="lock_title">Введіть PIN</string>
+    <string name="lock_wrong">Неправильний PIN. Залишилось спроб: %1$s</string>
+    <string name="lock_locked">Забагато спроб. Спробуйте за %1$s</string>
+    <string name="biometric_title">Розблокувати Coinfold</string>
+    <string name="biometric_subtitle">Підтвердіть, що це ви</string>
+    <string name="biometric_cancel">Ввести PIN</string>
 </resources>

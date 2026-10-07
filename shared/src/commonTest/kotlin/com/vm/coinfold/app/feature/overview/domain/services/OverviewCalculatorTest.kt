@@ -109,4 +109,104 @@ class OverviewCalculatorTest {
         assertTrue(summary.hasMissingRates)
         assertEquals(Money(0, Currency.UAH), summary.spent)
     }
+
+    // ---------- comparison with the previous period and the trend ----------
+
+    private fun inFeb(day: Int, amount: Long, type: TransactionType = TransactionType.EXPENSE, category: Long? = 1) =
+        OverviewTransaction(
+            type, category, Money(amount, Currency.UAH),
+            Instant.parse("2026-02-%02dT12:00:00Z".format(day)).toEpochMilliseconds(),
+        )
+
+    private fun compare(
+        current: List<OverviewTransaction>,
+        previous: List<OverviewTransaction>,
+        today: LocalDate,
+    ) = calculateOverview(
+        transactions = current, categories = listOf(food, fun_), rates = rates, mainCurrency = Currency.UAH,
+        period = period, today = today, timeZone = TimeZone.UTC, previousTransactions = previous,
+    )
+
+    @Test
+    fun runningPeriodIsComparedWithTheSameDaysOfThePreviousOne() {
+        val summary = compare(
+            current = listOf(tx(TransactionType.EXPENSE, 1, Money(100_000, Currency.UAH), 3)),
+            previous = listOf(inFeb(5, 50_000), inFeb(20, 900_000)), // the 20th is outside the first 10 days
+            today = LocalDate(2026, 3, 10),
+        )
+        val c = summary.comparison
+        assertEquals(Money(50_000, Currency.UAH), c.previousSpent)
+        assertEquals(100, c.spentChangePercent) // 1000 vs 500
+        assertTrue(c.sameDaysOnly)
+    }
+
+    @Test
+    fun finishedPeriodIsComparedWithTheWholePreviousOne() {
+        val summary = compare(
+            current = listOf(tx(TransactionType.EXPENSE, 1, Money(100_000, Currency.UAH), 3)),
+            previous = listOf(inFeb(5, 50_000), inFeb(20, 900_000)),
+            today = LocalDate(2026, 5, 1),
+        )
+        assertEquals(Money(950_000, Currency.UAH), summary.comparison.previousSpent)
+        assertEquals(-89, summary.comparison.spentChangePercent) // 1000 vs 9500 -> -89.5% rounded away from zero
+        assertEquals(false, summary.comparison.sameDaysOnly)
+    }
+
+    @Test
+    fun noPreviousSpendingMeansNoPercentage() {
+        val summary = compare(
+            current = listOf(tx(TransactionType.EXPENSE, 1, Money(100_000, Currency.UAH), 3)),
+            previous = emptyList(),
+            today = LocalDate(2026, 3, 10),
+        )
+        assertEquals(null, summary.comparison.spentChangePercent)
+        assertEquals(null, summary.shares.single().changePercent)
+    }
+
+    @Test
+    fun categoriesGetTheirOwnChange() {
+        val summary = compare(
+            current = listOf(
+                tx(TransactionType.EXPENSE, 1, Money(150_000, Currency.UAH), 3),
+                tx(TransactionType.EXPENSE, 2, Money(20_000, Currency.UAH), 4),
+            ),
+            previous = listOf(inFeb(2, 100_000, category = 1), inFeb(3, 40_000, category = 2)),
+            today = LocalDate(2026, 3, 10),
+        )
+        assertEquals(50, summary.shares.first { it.category == food }.changePercent) // 1500 vs 1000
+        assertEquals(-50, summary.shares.first { it.category == fun_ }.changePercent) // 200 vs 400
+    }
+
+    @Test
+    fun incomeIsComparedToo() {
+        val summary = compare(
+            current = listOf(tx(TransactionType.INCOME, null, Money(300_000, Currency.UAH), 2)),
+            previous = listOf(inFeb(2, 200_000, TransactionType.INCOME, null)),
+            today = LocalDate(2026, 3, 10),
+        )
+        assertEquals(50, summary.comparison.incomeChangePercent)
+    }
+
+    @Test
+    fun trendHasTwelvePeriodsEndingWithTheCurrentOne() {
+        val history = listOf(
+            inFeb(5, 100_000),
+            inFeb(6, 300_000, TransactionType.INCOME, null),
+            tx(TransactionType.EXPENSE, 1, Money(200_000, Currency.UAH), 3),
+        )
+        val summary = calculateOverview(
+            transactions = history.filter { it.dateTime >= Instant.parse("2026-03-01T00:00:00Z").toEpochMilliseconds() },
+            categories = listOf(food), rates = rates, mainCurrency = Currency.UAH, period = period,
+            today = LocalDate(2026, 3, 10), timeZone = TimeZone.UTC, history = history, periodStartDay = 1,
+        )
+
+        assertEquals(12, summary.trend.size)
+        assertEquals(LocalDate(2026, 3, 1), summary.trend.last().periodStart)
+        assertEquals(LocalDate(2025, 4, 1), summary.trend.first().periodStart)
+        val feb = summary.trend[summary.trend.size - 2]
+        assertEquals(Money(100_000, Currency.UAH), feb.spent)
+        assertEquals(Money(300_000, Currency.UAH), feb.income)
+        assertEquals(Money(200_000, Currency.UAH), summary.trend.last().spent)
+        assertEquals(Money(0, Currency.UAH), summary.trend.first().spent)
+    }
 }

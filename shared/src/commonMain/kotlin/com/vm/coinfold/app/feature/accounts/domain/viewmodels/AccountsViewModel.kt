@@ -64,6 +64,7 @@ class AccountsViewModel(
                 viewModelScope.launch { settingsRepository.setMainCurrency(intent.currency) }
             is AccountsIntent.SaveAccount -> saveAccount(intent)
             AccountsIntent.ConfirmDelete -> confirmDelete()
+            AccountsIntent.UndoDelete -> viewModelScope.launch { accountRepository.undoDelete() }
             is AccountsIntent.SaveOperation -> saveOperation(intent)
         }
     }
@@ -95,7 +96,7 @@ class AccountsViewModel(
                 DeleteResult.DELETED -> Res.string.accounts_deleted
                 DeleteResult.ARCHIVED -> Res.string.accounts_archived
             }
-            effects.send(AccountsEffect.ShowMessage(message))
+            effects.send(AccountsEffect.ShowUndo(message))
         }
     }
 

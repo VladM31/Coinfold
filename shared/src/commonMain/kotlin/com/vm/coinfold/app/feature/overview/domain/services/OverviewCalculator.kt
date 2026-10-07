@@ -5,8 +5,10 @@ import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.feature.overview.domain.models.BarSegment
 import com.vm.coinfold.app.feature.overview.domain.models.CategoryShare
 import com.vm.coinfold.app.feature.overview.domain.models.DayBar
+import com.vm.coinfold.app.feature.overview.domain.models.MonthlyPoint
 import com.vm.coinfold.app.feature.overview.domain.models.OverviewSummary
 import com.vm.coinfold.app.feature.overview.domain.models.OverviewTransaction
+import com.vm.coinfold.app.feature.overview.domain.models.PeriodComparison
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.Money
 import com.vm.coinfold.app.shared.domain.models.Period
@@ -40,9 +42,11 @@ fun calculateOverview(
     period: Period,
     today: LocalDate,
     timeZone: TimeZone,
-    /** Every expense ever recorded; used for the monthly average. */
+    /** Every transaction ever recorded; used for the monthly average and the trend. */
     history: List<OverviewTransaction> = transactions,
     periodStartDay: Int = 1,
+    /** Transactions of the previous period, for the comparison. */
+    previousTransactions: List<OverviewTransaction> = emptyList(),
 ): OverviewSummary {
     val zero = Money.zero(mainCurrency)
     val activeIds = categories.mapTo(HashSet()) { it.id }
@@ -82,19 +86,40 @@ fun calculateOverview(
         DayBar(date, segments, segments.fold(zero) { acc, s -> acc + s.amount })
     }
 
-    val shares = buildList {
-        categories.forEach { c ->
-            val amount = perCategory[c.id] ?: return@forEach
-            add(CategoryShare(c, amount, percentOf(amount, spent)))
-        }
-        perCategory[null]?.let { add(CategoryShare(null, it, percentOf(it, spent))) }
-    }.sortedByDescending { it.spent.minorUnits }
-
     val elapsedDays = when {
         today < period.start -> 1
         today >= period.endExclusive -> lengthDays
         else -> period.start.daysUntil(today) + 1
     }.coerceAtLeast(1)
+
+    // Previous period: only the same number of days while the period is still running.
+    val previousPeriod = period.shiftMonths(-1)
+    val compareEnd = minOf(previousPeriod.start.plus(elapsedDays, DateTimeUnit.DAY), previousPeriod.endExclusive)
+    var previousIncome = zero
+    val previousPerCategory = HashMap<Long?, Money>()
+    for (tx in previousTransactions) {
+        val date = Instant.fromEpochMilliseconds(tx.dateTime).toLocalDateTime(timeZone).date
+        if (date < previousPeriod.start || date >= compareEnd) continue
+        val converted = rates.convert(tx.money, mainCurrency)?.money ?: continue
+        if (tx.type == TransactionType.INCOME) {
+            previousIncome += converted
+        } else {
+            val key = tx.categoryId?.takeIf { it in activeIds }
+            previousPerCategory[key] = (previousPerCategory[key] ?: zero) + converted
+        }
+    }
+    val previousSpent = previousPerCategory.values.fold(zero) { acc, m -> acc + m }
+
+    val shares = buildList {
+        categories.forEach { c ->
+            val amount = perCategory[c.id] ?: return@forEach
+            add(CategoryShare(c, amount, percentOf(amount, spent), changePercent(amount, previousPerCategory[c.id])))
+        }
+        perCategory[null]?.let {
+            add(CategoryShare(null, it, percentOf(it, spent), changePercent(it, previousPerCategory[null])))
+        }
+    }.sortedByDescending { it.spent.minorUnits }
+
     val dayAverage = Money(divideRounded(spent.minorUnits, elapsedDays.toLong()), mainCurrency)
     // Week: spending so far divided by the weeks that have been started, so the first days of a period show
     // what was actually spent instead of a projection.
@@ -111,9 +136,53 @@ fun calculateOverview(
         dayAverage = dayAverage,
         weekAverage = weekAverage,
         monthAverage = monthAverage,
+        comparison = PeriodComparison(
+            previousSpent = previousSpent,
+            previousIncome = previousIncome,
+            spentChangePercent = changePercent(spent, previousSpent),
+            incomeChangePercent = changePercent(income, previousIncome),
+            sameDaysOnly = today >= period.start && today < period.endExclusive,
+        ),
+        trend = buildTrend(history, rates, mainCurrency, period, periodStartDay, timeZone),
         hasMissingRates = missing,
     )
 }
+
+/** Percent change from [previous] to [current], rounded; null when there is no (or a zero) previous value. */
+private fun changePercent(current: Money, previous: Money?): Int? {
+    if (previous == null || previous.minorUnits <= 0) return null
+    val diff = current.minorUnits - previous.minorUnits
+    val half = previous.minorUnits / 2
+    return ((diff * 100 + if (diff >= 0) half else -half) / previous.minorUnits).toInt()
+}
+
+/** Income and spending of the last [points] periods, ending with [period], oldest first. */
+@OptIn(ExperimentalTime::class)
+private fun buildTrend(
+    history: List<OverviewTransaction>,
+    rates: RateTable,
+    mainCurrency: Currency,
+    period: Period,
+    periodStartDay: Int,
+    timeZone: TimeZone,
+    points: Int = TREND_PERIODS,
+): List<MonthlyPoint> {
+    val income = HashMap<LocalDate, Long>()
+    val spent = HashMap<LocalDate, Long>()
+    for (tx in history) {
+        val converted = rates.convert(tx.money, mainCurrency)?.money ?: continue
+        val date = Instant.fromEpochMilliseconds(tx.dateTime).toLocalDateTime(timeZone).date
+        val start = Period.containing(date, periodStartDay).start
+        val target = if (tx.type == TransactionType.INCOME) income else spent
+        target[start] = (target[start] ?: 0L) + converted.minorUnits
+    }
+    return (points - 1 downTo 0).map { back ->
+        val start = period.shiftMonths(-back).start
+        MonthlyPoint(start, Money(income[start] ?: 0L, mainCurrency), Money(spent[start] ?: 0L, mainCurrency))
+    }
+}
+
+private const val TREND_PERIODS = 12
 
 private fun percentOf(part: Money, total: Money): Int =
     if (total.minorUnits <= 0) 0 else divideRounded(part.minorUnits * 100, total.minorUnits).toInt()

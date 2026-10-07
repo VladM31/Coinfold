@@ -146,4 +146,110 @@
     <!-- Account sheet -->
     <string name="accounts_operation_label">Operation</string>
     <string name="accounts_balance_after">Balance after</string>
+
+    <!-- Undo / duplicate -->
+    <string name="action_undo">Undo</string>
+    <string name="action_duplicate">Duplicate</string>
+    <string name="transaction_duplicated">Transaction duplicated for today</string>
+
+    <!-- Recurring payments -->
+    <string name="settings_recurring">Recurring payments</string>
+    <string name="settings_recurring_hint">Subscriptions, rent, salary: transactions are created automatically on schedule</string>
+    <string name="settings_recurring_open">Manage</string>
+    <string name="recurring_title">Recurring payments</string>
+    <string name="recurring_empty">No recurring payments yet. Add a subscription, rent or salary.</string>
+    <string name="recurring_add">Add</string>
+    <string name="recurring_new_title">New recurring payment</string>
+    <string name="recurring_edit_title">Edit recurring payment</string>
+    <string name="recurring_deleted">Recurring payment deleted</string>
+    <string name="recurring_repeat">Repeat</string>
+    <string name="recurring_first_date">First date</string>
+    <string name="recurring_next">next %1$s</string>
+    <string name="freq_daily">Every day</string>
+    <string name="freq_weekly">Every week</string>
+    <string name="freq_monthly">Every month</string>
+    <string name="freq_yearly">Every year</string>
+
+    <!-- Overview: comparison and trend -->
+    <string name="overview_vs_same">Spending is the same as in the previous period</string>
+    <string name="overview_vs_more">Spending is %1$s higher than in the previous period</string>
+    <string name="overview_vs_less">Spending is %1$s lower than in the previous period</string>
+    <string name="overview_vs_more_days">Spending is %1$s higher than in the same days of the previous period</string>
+    <string name="overview_vs_less_days">Spending is %1$s lower than in the same days of the previous period</string>
+    <string name="overview_trend_title">Last 12 periods</string>
+    <string name="overview_trend_income">Income</string>
+    <string name="overview_trend_expenses">Expenses</string>
+
+    <!-- Manual rate -->
+    <string name="rate_label">Rate: 1 %1$s = … %2$s</string>
+
+    <string name="rate_button_bank">Exchange rate: bank</string>
+    <string name="rate_button_custom">Exchange rate: %1$s</string>
+    <string name="rate_dialog_title">Exchange rate</string>
+    <string name="rate_dialog_hint">Used for this operation only. Leave empty to use the bank rate.</string>
+    <string name="rate_bank">Bank rate: %1$s</string>
+    <string name="rate_use_bank">Use bank rate</string>
+
+    <!-- Backup and export -->
+    <string name="settings_backup">Backup and export</string>
+    <string name="settings_backup_hint">Save your data to a file, restore it, or export transactions to a spreadsheet or PDF</string>
+    <string name="backup_title">Backup and export</string>
+    <string name="backup_section_backup">Backup</string>
+    <string name="backup_section_backup_hint">A backup is one file with all your accounts, categories, transactions, recurring payments and settings. Keep it somewhere safe, for example in your cloud drive. Restoring replaces everything on this device.</string>
+    <string name="backup_create">Create backup</string>
+    <string name="backup_restore">Restore from file</string>
+    <string name="backup_section_export">Export transactions</string>
+    <string name="backup_section_export_hint">Choose the period, then export a CSV file for a spreadsheet or a printable PDF report.</string>
+    <string name="export_range_all">All time</string>
+    <string name="export_range_current">Current period</string>
+    <string name="export_range_previous">Previous period</string>
+    <string name="export_csv">Export CSV</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="backup_restore_title">Replace all data?</string>
+    <string name="backup_restore_message">The backup from %1$s has %2$s accounts, %3$s categories, %4$s transactions and %5$s recurring payments. All data currently on this device will be replaced by it.</string>
+    <string name="backup_restore_confirm">Replace</string>
+    <string name="backup_restored">Backup restored</string>
+    <string name="backup_error_unreadable">This file is not a readable backup</string>
+    <string name="backup_error_not_coinfold">This is not a Coinfold backup file</string>
+    <string name="backup_error_newer">This backup was made by a newer version of the app</string>
+    <string name="backup_error_invalid">The backup contains values that cannot be loaded</string>
+    <string name="backup_error_broken">The backup is inconsistent: some records point to missing accounts or categories</string>
+    <string name="backup_error_duplicate">The backup contains duplicate records</string>
+    <string name="backup_error_failed">Something went wrong. Your data was not changed.</string>
+    <string name="report_title">Coinfold: transactions</string>
+    <string name="report_generated">created %1$s</string>
+    <string name="report_income">Income</string>
+    <string name="report_expenses">Expenses</string>
+    <string name="report_balance">Balance</string>
+    <string name="report_count">Transactions: %1$s</string>
+    <string name="report_range_all">All time</string>
+    <string name="report_range_current">Current period</string>
+    <string name="report_range_previous">Previous period</string>
+    <string name="report_col_date">Date</string>
+    <string name="report_col_account">Account</string>
+    <string name="report_col_category">Category</string>
+    <string name="report_col_note">Note</string>
+    <string name="report_col_amount">Amount</string>
+    <string name="report_col_in_account">In account</string>
+
+    <!-- Security -->
+    <string name="security_title">Security</string>
+    <string name="security_hint">Lock the app with a 4-digit PIN. It asks for the PIN when you open the app and when you come back after half a minute away, and it hides the app in the recent apps list and blocks screenshots. Backups do not contain the PIN.</string>
+    <string name="security_set_pin">Set PIN</string>
+    <string name="security_pin_on">PIN lock is on</string>
+    <string name="security_change_pin">Change PIN</string>
+    <string name="security_turn_off">Turn off</string>
+    <string name="security_biometric">Unlock with fingerprint or face</string>
+    <string name="pin_current">Enter your current PIN</string>
+    <string name="pin_new">Enter a new PIN</string>
+    <string name="pin_confirm">Repeat the new PIN</string>
+    <string name="pin_wrong">Wrong PIN</string>
+    <string name="pin_mismatch">The PINs did not match. Try again.</string>
+    <string name="pin_locked">Too many wrong attempts. Try again later.</string>
+    <string name="lock_title">Enter PIN</string>
+    <string name="lock_wrong">Wrong PIN. Attempts left: %1$s</string>
+    <string name="lock_locked">Too many attempts. Try again in %1$s</string>
+    <string name="biometric_title">Unlock Coinfold</string>
+    <string name="biometric_subtitle">Confirm it is you</string>
+    <string name="biometric_cancel">Use PIN</string>
 </resources>

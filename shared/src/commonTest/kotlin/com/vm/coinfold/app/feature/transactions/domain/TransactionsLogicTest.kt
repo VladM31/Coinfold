@@ -4,6 +4,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.currency.domain.models.RateTable
 import com.vm.coinfold.app.feature.currency.domain.repositories.CurrencyRepository
 import com.vm.coinfold.app.feature.currency.domain.usecases.ConvertMoneyUseCase
+import com.vm.coinfold.app.feature.transactions.domain.models.NoteSuggestion
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionItem
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionQuery
 import com.vm.coinfold.app.feature.transactions.domain.models.UpdateTransactionResult
@@ -77,6 +78,7 @@ class TransactionsLogicTest {
     private class FakeRepository : TransactionRepository {
         var updated: Triple<Money, Money, BigDecimal>? = null
         override val customIncomeSources: Flow<List<String>> = MutableStateFlow(emptyList())
+        override val noteSuggestions: Flow<List<NoteSuggestion>> = flowOf(emptyList())
         override suspend fun addManual(
             type: TransactionType, accountId: Long, amount: Money, source: IncomeSource?, note: String, dateTime: Long,
         ) = Unit
@@ -92,6 +94,8 @@ class TransactionsLogicTest {
             updated = Triple(amount, accountAmount, rate)
         }
         override suspend fun delete(id: Long) = Unit
+        override suspend fun undoDelete() = Unit
+        override suspend fun duplicate(id: Long, dateTime: Long) = true
     }
 
     private class FakeCurrencies(table: RateTable) : CurrencyRepository {

@@ -17,3 +17,9 @@ enum class Route(val path: String, val label: StringResource, val icon: NavIconK
     Transactions("transactions", Res.string.nav_transactions, NavIconKind.TRANSACTIONS),
     Settings("settings", Res.string.nav_settings, NavIconKind.SETTINGS),
 }
+
+/** Screen reached from Settings; it is not a bottom navigation tab. */
+const val RECURRING_ROUTE = "recurring"
+
+/** Backup, restore and export screen, reached from Settings. */
+const val BACKUP_ROUTE = "backup"

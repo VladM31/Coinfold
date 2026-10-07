@@ -18,8 +18,8 @@ class OverviewRepositoryImpl(private val dao: OverviewDao) : OverviewRepository 
         }
     }
 
-    override fun observeAllExpenses(): Flow<List<OverviewTransaction>> =
-        dao.observeAllExpenses().map { rows -> rows.map { it.toTransaction() } }
+    override fun observeAllTransactions(): Flow<List<OverviewTransaction>> =
+        dao.observeAll().map { rows -> rows.map { it.toTransaction() } }
 }
 
 private fun OverviewRow.toTransaction() = OverviewTransaction(type, categoryId, Money(amountMinor, currency), dateTime)

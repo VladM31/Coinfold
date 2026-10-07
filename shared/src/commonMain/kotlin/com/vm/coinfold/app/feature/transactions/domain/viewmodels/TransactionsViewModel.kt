@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.expense_no_rate
 import coinfold.shared.generated.resources.transaction_deleted
+import coinfold.shared.generated.resources.transaction_duplicated
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.accounts.domain.repositories.AccountRepository
 import com.vm.coinfold.app.feature.currency.domain.models.RateTable
@@ -136,6 +137,8 @@ class TransactionsViewModel(
             is TransactionsIntent.ItemClicked -> dialog.value = TransactionsDialog.Edit(intent.item)
             is TransactionsIntent.DeleteClicked -> dialog.value = TransactionsDialog.ConfirmDelete(intent.item)
             TransactionsIntent.ConfirmDelete -> confirmDelete()
+            TransactionsIntent.UndoDelete -> viewModelScope.launch { transactionRepository.undoDelete() }
+            is TransactionsIntent.DuplicateClicked -> duplicate(intent.item)
             TransactionsIntent.DismissDialog -> dialog.value = null
             is TransactionsIntent.SaveEdit -> saveEdit(intent)
         }
@@ -147,7 +150,16 @@ class TransactionsViewModel(
             // Balances are derived from the transactions, so removing the row recalculates them.
             transactionRepository.delete(item.id)
             dialog.value = null
-            effects.send(TransactionsEffect.ShowMessage(Res.string.transaction_deleted))
+            effects.send(TransactionsEffect.ShowUndo(Res.string.transaction_deleted))
+        }
+    }
+
+    /** Copies the transaction to today, so a repeated purchase is one tap away. */
+    private fun duplicate(item: TransactionItem) {
+        viewModelScope.launch {
+            transactionRepository.duplicate(item.id, epochMillisFor(today()))
+            dialog.value = null
+            effects.send(TransactionsEffect.ShowMessage(Res.string.transaction_duplicated))
         }
     }
 
@@ -177,6 +189,7 @@ class TransactionsViewModel(
                 amount = amount,
                 note = intent.note,
                 dateTime = dateTime,
+                rateOverride = intent.rateOverride,
             )
             when (result) {
                 UpdateTransactionResult.SUCCESS, UpdateTransactionResult.NOT_FOUND -> dialog.value = null

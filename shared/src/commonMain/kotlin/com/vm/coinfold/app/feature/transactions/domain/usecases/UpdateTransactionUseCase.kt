@@ -27,6 +27,8 @@ class UpdateTransactionUseCase(
         amount: Money,
         note: String,
         dateTime: Long,
+        /** A rate typed by the user; wins over the stored and the bank rate when the currencies differ. */
+        rateOverride: BigDecimal? = null,
     ): UpdateTransactionResult {
         val accountAmount: Money
         val rate: BigDecimal
@@ -34,6 +36,10 @@ class UpdateTransactionUseCase(
             amount.currency == accountCurrency -> {
                 accountAmount = amount
                 rate = BigDecimal.ONE
+            }
+            rateOverride != null -> {
+                rate = rateOverride
+                accountAmount = amount.convertTo(accountCurrency, rate)
             }
             original.amount.currency == amount.currency && original.accountCurrency == accountCurrency -> {
                 rate = original.rate

@@ -43,6 +43,7 @@ import com.vm.coinfold.app.feature.transactions.ui.components.DayHeader
 import com.vm.coinfold.app.feature.transactions.ui.components.EditTransactionSheet
 import com.vm.coinfold.app.feature.transactions.ui.components.FilterSheet
 import com.vm.coinfold.app.feature.transactions.ui.components.TransactionListItem
+import com.vm.coinfold.app.shared.ui.components.showUndo
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -56,6 +57,7 @@ fun TransactionsScreen(viewModel: TransactionsViewModel = koinViewModel()) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 is TransactionsEffect.ShowMessage -> snackbar.showSnackbar(getString(effect.message))
+                is TransactionsEffect.ShowUndo -> if (snackbar.showUndo(effect.message)) viewModel.onIntent(TransactionsIntent.UndoDelete)
             }
         }
     }
@@ -141,10 +143,11 @@ private fun TransactionsDialogs(state: TransactionsState, onIntent: (Transaction
             accounts = state.accounts,
             categories = state.categories,
             customSources = state.customSources,
-            onSave = { amount, currency, accountId, categoryId, source, note, date ->
-                onIntent(TransactionsIntent.SaveEdit(amount, currency, accountId, categoryId, source, note, date))
+            onSave = { amount, currency, accountId, categoryId, source, note, date, rate ->
+                onIntent(TransactionsIntent.SaveEdit(amount, currency, accountId, categoryId, source, note, date, rate))
             },
             onDelete = { onIntent(TransactionsIntent.DeleteClicked(dialog.item)) },
+            onDuplicate = { onIntent(TransactionsIntent.DuplicateClicked(dialog.item)) },
             onDismiss = dismiss,
         )
         is TransactionsDialog.ConfirmDelete -> AlertDialog(

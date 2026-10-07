@@ -50,3 +50,7 @@ fun formatDateTime(epochMillis: Long, timeZone: TimeZone = TimeZone.currentSyste
     val mm = local.minute.toString().padStart(2, '0')
     return "${local.date.format()} $hh:$mm"
 }
+
+/** Current time as UTC epoch millis. */
+@OptIn(ExperimentalTime::class)
+fun nowMillis(): Long = Clock.System.now().toEpochMilliseconds()

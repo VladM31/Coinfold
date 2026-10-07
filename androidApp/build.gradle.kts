@@ -14,6 +14,8 @@ dependencies {
     implementation(project(":shared"))
 
     implementation(libs.androidx.activity.compose)
+    // BiometricPrompt needs a FragmentActivity, which comes with this library
+    implementation(libs.androidx.biometric)
 
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
