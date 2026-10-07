@@ -1,4 +1,4 @@
-package com.vm.coinfold.app.shared.ui
+package com.vm.coinfold.app.shared.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

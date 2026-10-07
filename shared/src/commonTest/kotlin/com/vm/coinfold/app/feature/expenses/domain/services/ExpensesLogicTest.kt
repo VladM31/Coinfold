@@ -3,10 +3,10 @@ package com.vm.coinfold.app.feature.expenses.domain.services
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.currency.domain.models.RateTable
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
-import com.vm.coinfold.app.shared.domain.models.Period
 import com.vm.coinfold.app.feature.expenses.domain.models.PeriodTotal
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.Money
+import com.vm.coinfold.app.shared.domain.models.Period
 import com.vm.coinfold.app.shared.domain.models.TransactionType
 import kotlin.test.Test
 import kotlin.test.assertEquals

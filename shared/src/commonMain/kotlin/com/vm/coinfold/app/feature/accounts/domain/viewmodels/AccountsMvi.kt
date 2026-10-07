@@ -3,8 +3,8 @@ package com.vm.coinfold.app.feature.accounts.domain.viewmodels
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.accounts.domain.models.TotalBalance
-import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.Currency
+import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.TransactionType
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.StringResource

@@ -41,3 +41,12 @@ fun pickerMillisFor(date: LocalDate): Long = date.atTime(0, 0).toInstant(TimeZon
 /** `dd.MM.yyyy` — same in both supported languages. */
 fun LocalDate.format(): String =
     "${day.toString().padStart(2, '0')}.${month.number.toString().padStart(2, '0')}.$year"
+
+/** `dd.MM.yyyy HH:mm` in the local time zone. */
+@OptIn(ExperimentalTime::class)
+fun formatDateTime(epochMillis: Long, timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
+    val local = Instant.fromEpochMilliseconds(epochMillis).toLocalDateTime(timeZone)
+    val hh = local.hour.toString().padStart(2, '0')
+    val mm = local.minute.toString().padStart(2, '0')
+    return "${local.date.format()} $hh:$mm"
+}

@@ -1,4 +1,4 @@
-package com.vm.coinfold.app.feature.transactions.ui
+package com.vm.coinfold.app.feature.transactions.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,7 +44,7 @@ import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.feature.transactions.domain.models.PeriodFilter
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionFilter
 import com.vm.coinfold.app.shared.domain.models.TransactionType
-import com.vm.coinfold.app.shared.ui.DateField
+import com.vm.coinfold.app.shared.ui.components.DateField
 import com.vm.coinfold.app.utils.today
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus

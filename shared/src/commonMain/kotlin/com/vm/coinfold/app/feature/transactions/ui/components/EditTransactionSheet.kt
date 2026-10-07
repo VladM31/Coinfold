@@ -1,4 +1,4 @@
-package com.vm.coinfold.app.feature.transactions.ui
+package com.vm.coinfold.app.feature.transactions.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,10 +46,10 @@ import com.vm.coinfold.app.feature.transactions.domain.models.TransactionItem
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.TransactionType
-import com.vm.coinfold.app.shared.ui.CurrencySelector
-import com.vm.coinfold.app.shared.ui.DateField
-import com.vm.coinfold.app.shared.ui.IncomeSourcePicker
-import com.vm.coinfold.app.shared.ui.resolveSource
+import com.vm.coinfold.app.shared.ui.components.CurrencySelector
+import com.vm.coinfold.app.shared.ui.components.DateField
+import com.vm.coinfold.app.shared.ui.components.IncomeSourcePicker
+import com.vm.coinfold.app.shared.ui.components.resolveSource
 import com.vm.coinfold.app.utils.parseAmount
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant

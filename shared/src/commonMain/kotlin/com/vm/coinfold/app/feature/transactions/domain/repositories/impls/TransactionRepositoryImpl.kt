@@ -131,4 +131,3 @@ private fun TransactionRow.toItem(): TransactionItem {
         dateTime = t.dateTime,
     )
 }
-

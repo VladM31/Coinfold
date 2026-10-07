@@ -1,4 +1,4 @@
-package com.vm.coinfold.app.feature.expenses.ui
+package com.vm.coinfold.app.feature.expenses.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,8 +44,8 @@ import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.Money
-import com.vm.coinfold.app.shared.ui.CurrencySelector
-import com.vm.coinfold.app.shared.ui.DateField
+import com.vm.coinfold.app.shared.ui.components.CurrencySelector
+import com.vm.coinfold.app.shared.ui.components.DateField
 import com.vm.coinfold.app.utils.Calculator
 import com.vm.coinfold.app.utils.CalculatorInput
 import com.vm.coinfold.app.utils.OP_DIVIDE

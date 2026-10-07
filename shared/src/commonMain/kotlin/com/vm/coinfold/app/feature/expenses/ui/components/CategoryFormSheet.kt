@@ -1,4 +1,4 @@
-package com.vm.coinfold.app.feature.expenses.ui
+package com.vm.coinfold.app.feature.expenses.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,8 +47,8 @@ import coinfold.shared.generated.resources.field_color
 import coinfold.shared.generated.resources.field_name
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.feature.expenses.domain.models.CategoryIcons
-import com.vm.coinfold.app.shared.ui.ColorPalette
-import com.vm.coinfold.app.shared.ui.ColorPicker
+import com.vm.coinfold.app.shared.ui.components.ColorPalette
+import com.vm.coinfold.app.shared.ui.components.ColorPicker
 import org.jetbrains.compose.resources.stringResource
 
 /** Create ([category] == null) or edit a category; editing also offers reordering and delete. */

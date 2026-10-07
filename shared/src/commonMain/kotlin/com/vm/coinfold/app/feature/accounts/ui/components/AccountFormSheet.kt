@@ -1,4 +1,4 @@
-package com.vm.coinfold.app.feature.accounts.ui
+package com.vm.coinfold.app.feature.accounts.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,8 +39,8 @@ import coinfold.shared.generated.resources.field_name
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.shared.domain.models.Currency
-import com.vm.coinfold.app.shared.ui.ColorPicker
-import com.vm.coinfold.app.shared.ui.CurrencySelector
+import com.vm.coinfold.app.shared.ui.components.ColorPicker
+import com.vm.coinfold.app.shared.ui.components.CurrencySelector
 import com.vm.coinfold.app.utils.parseAmount
 import org.jetbrains.compose.resources.stringResource
 

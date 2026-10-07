@@ -4,7 +4,6 @@
     <string name="nav_expenses">Витрати</string>
     <string name="nav_transactions">Транзакції</string>
     <string name="nav_settings">Налаштування</string>
-    <string name="placeholder_coming_soon">Незабаром</string>
 
     <!-- Common -->
     <string name="action_save">Зберегти</string>
@@ -85,4 +84,26 @@
     <string name="filter_apply">Застосувати</string>
     <string name="type_income">Надходження</string>
     <string name="type_expense">Витрата</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Налаштування</string>
+    <string name="settings_theme">Тема</string>
+    <string name="theme_system">Системна</string>
+    <string name="theme_light">Світла</string>
+    <string name="theme_dark">Темна</string>
+    <string name="settings_language">Мова</string>
+    <string name="language_system">Системна</string>
+    <string name="language_en">English</string>
+    <string name="language_uk">Українська</string>
+    <string name="settings_main_currency">Основна валюта</string>
+    <string name="settings_main_currency_hint">Для загального балансу та діаграми витрат</string>
+    <string name="settings_period_start">Початковий день періоду</string>
+    <string name="settings_period_start_value">%1$d-е число місяця</string>
+    <string name="settings_period_hint">Період витрат триває від цього дня до дня перед ним у наступному місяці</string>
+    <string name="settings_rates">Курси валют</string>
+    <string name="settings_rates_updated_at">Оновлено: %1$s</string>
+    <string name="settings_rates_never">Ще не завантажено</string>
+    <string name="settings_rates_refresh">Оновити</string>
+    <string name="settings_rates_updated">Курси оновлено</string>
+    <string name="settings_rates_not_updated">Курси не оновлено (немає мережі або оновлено менш ніж 5 хвилин тому)</string>
 </resources>

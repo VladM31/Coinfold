@@ -8,6 +8,7 @@ import com.vm.coinfold.app.feature.expenses.domain.repositories.ExpenseStatsRepo
 import com.vm.coinfold.app.feature.expenses.domain.repositories.impls.CategoryRepositoryImpl
 import com.vm.coinfold.app.feature.expenses.domain.repositories.impls.ExpenseStatsRepositoryImpl
 import com.vm.coinfold.app.feature.expenses.domain.viewmodels.ExpensesViewModel
+import com.vm.coinfold.app.feature.settings.domain.viewmodels.SettingsViewModel
 import com.vm.coinfold.app.feature.transactions.domain.repositories.TransactionRepository
 import com.vm.coinfold.app.feature.transactions.domain.repositories.impls.TransactionRepositoryImpl
 import com.vm.coinfold.app.feature.transactions.domain.usecases.AddExpenseUseCase
@@ -35,3 +36,8 @@ val expensesModule = module {
     single<ExpenseStatsRepository> { ExpenseStatsRepositoryImpl(get()) }
     viewModelOf(::ExpensesViewModel)
 }
+
+val settingsModule = module {
+    viewModelOf(::SettingsViewModel)
+}
+

@@ -1,4 +1,4 @@
-package com.vm.coinfold.app.shared.ui
+package com.vm.coinfold.app.shared.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background

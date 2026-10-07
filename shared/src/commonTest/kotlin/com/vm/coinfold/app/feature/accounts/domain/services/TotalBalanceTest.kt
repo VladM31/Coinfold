@@ -4,8 +4,8 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.Account
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.currency.domain.models.RateTable
-import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.Currency
+import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.Money
 import kotlin.test.Test
 import kotlin.test.assertEquals

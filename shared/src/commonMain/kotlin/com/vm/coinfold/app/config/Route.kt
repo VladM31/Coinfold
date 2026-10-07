@@ -5,7 +5,7 @@ import coinfold.shared.generated.resources.nav_accounts
 import coinfold.shared.generated.resources.nav_expenses
 import coinfold.shared.generated.resources.nav_settings
 import coinfold.shared.generated.resources.nav_transactions
-import com.vm.coinfold.app.shared.ui.NavIconKind
+import com.vm.coinfold.app.shared.ui.components.NavIconKind
 import org.jetbrains.compose.resources.StringResource
 
 /** Bottom navigation destinations; [Expenses] is the start (main) screen. */

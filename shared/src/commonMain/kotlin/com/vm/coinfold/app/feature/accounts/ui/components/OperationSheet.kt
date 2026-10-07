@@ -1,4 +1,4 @@
-package com.vm.coinfold.app.feature.accounts.ui
+package com.vm.coinfold.app.feature.accounts.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,9 +36,9 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.TransactionType
-import com.vm.coinfold.app.shared.ui.DateField
-import com.vm.coinfold.app.shared.ui.IncomeSourcePicker
-import com.vm.coinfold.app.shared.ui.resolveSource
+import com.vm.coinfold.app.shared.ui.components.DateField
+import com.vm.coinfold.app.shared.ui.components.IncomeSourcePicker
+import com.vm.coinfold.app.shared.ui.components.resolveSource
 import com.vm.coinfold.app.utils.parseAmount
 import com.vm.coinfold.app.utils.today
 import kotlinx.datetime.LocalDate

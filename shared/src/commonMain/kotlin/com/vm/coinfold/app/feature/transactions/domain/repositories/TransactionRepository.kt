@@ -1,11 +1,11 @@
 package com.vm.coinfold.app.feature.transactions.domain.repositories
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.vm.coinfold.app.feature.transactions.domain.models.TransactionItem
+import com.vm.coinfold.app.feature.transactions.domain.models.TransactionQuery
 import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.Money
 import com.vm.coinfold.app.shared.domain.models.TransactionType
-import com.vm.coinfold.app.feature.transactions.domain.models.TransactionItem
-import com.vm.coinfold.app.feature.transactions.domain.models.TransactionQuery
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {

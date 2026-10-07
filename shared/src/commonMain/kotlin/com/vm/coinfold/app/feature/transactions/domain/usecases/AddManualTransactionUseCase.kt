@@ -1,7 +1,7 @@
 package com.vm.coinfold.app.feature.transactions.domain.usecases
 
-import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.feature.transactions.domain.repositories.TransactionRepository
+import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.Money
 import com.vm.coinfold.app.shared.domain.models.TransactionType
 

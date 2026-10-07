@@ -11,7 +11,6 @@ import com.vm.coinfold.app.feature.currency.domain.models.RateTable
 import com.vm.coinfold.app.feature.currency.domain.repositories.CurrencyRepository
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.feature.expenses.domain.models.CategoryDeleteResult
-import com.vm.coinfold.app.shared.domain.models.Period
 import com.vm.coinfold.app.feature.expenses.domain.models.PeriodTotal
 import com.vm.coinfold.app.feature.expenses.domain.repositories.CategoryRepository
 import com.vm.coinfold.app.feature.expenses.domain.repositories.ExpenseStatsRepository
@@ -21,6 +20,7 @@ import com.vm.coinfold.app.feature.settings.domain.repositories.SettingsReposito
 import com.vm.coinfold.app.feature.transactions.domain.models.AddExpenseResult
 import com.vm.coinfold.app.feature.transactions.domain.usecases.AddExpenseUseCase
 import com.vm.coinfold.app.shared.domain.models.Money
+import com.vm.coinfold.app.shared.domain.models.Period
 import com.vm.coinfold.app.utils.epochMillisFor
 import com.vm.coinfold.app.utils.today
 import kotlinx.coroutines.ExperimentalCoroutinesApi

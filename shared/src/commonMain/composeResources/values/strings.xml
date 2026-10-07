@@ -4,7 +4,6 @@
     <string name="nav_expenses">Expenses</string>
     <string name="nav_transactions">Transactions</string>
     <string name="nav_settings">Settings</string>
-    <string name="placeholder_coming_soon">Coming soon</string>
 
     <!-- Common -->
     <string name="action_save">Save</string>
@@ -85,4 +84,26 @@
     <string name="filter_apply">Apply</string>
     <string name="type_income">Income</string>
     <string name="type_expense">Expense</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings_language">Language</string>
+    <string name="language_system">System</string>
+    <string name="language_en">English</string>
+    <string name="language_uk">Українська</string>
+    <string name="settings_main_currency">Main currency</string>
+    <string name="settings_main_currency_hint">Used for the total balance and the expenses chart</string>
+    <string name="settings_period_start">Period start day</string>
+    <string name="settings_period_start_value">Day %1$d of the month</string>
+    <string name="settings_period_hint">Your spending period runs from this day to the day before it in the next month</string>
+    <string name="settings_rates">Exchange rates</string>
+    <string name="settings_rates_updated_at">Updated: %1$s</string>
+    <string name="settings_rates_never">Not loaded yet</string>
+    <string name="settings_rates_refresh">Refresh</string>
+    <string name="settings_rates_updated">Rates updated</string>
+    <string name="settings_rates_not_updated">Rates were not updated (offline or updated less than 5 minutes ago)</string>
 </resources>

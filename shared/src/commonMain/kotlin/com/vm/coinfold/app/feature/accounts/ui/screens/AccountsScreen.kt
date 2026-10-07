@@ -1,11 +1,8 @@
-package com.vm.coinfold.app.feature.accounts.ui
+package com.vm.coinfold.app.feature.accounts.ui.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -28,8 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coinfold.shared.generated.resources.Res
@@ -38,22 +31,17 @@ import coinfold.shared.generated.resources.accounts_delete_message
 import coinfold.shared.generated.resources.accounts_delete_message_archive
 import coinfold.shared.generated.resources.accounts_delete_title
 import coinfold.shared.generated.resources.accounts_empty
-import coinfold.shared.generated.resources.accounts_rates_missing
-import coinfold.shared.generated.resources.accounts_top_up
-import coinfold.shared.generated.resources.accounts_total_balance
-import coinfold.shared.generated.resources.accounts_withdraw
 import coinfold.shared.generated.resources.action_cancel
 import coinfold.shared.generated.resources.action_delete
-import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsDialog
 import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsEffect
 import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsIntent
 import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsState
 import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsViewModel
-import com.vm.coinfold.app.shared.ui.ColorDot
-import com.vm.coinfold.app.shared.ui.CurrencySelector
-import com.vm.coinfold.app.shared.ui.LocalAppLanguage
-import com.vm.coinfold.app.utils.format
+import com.vm.coinfold.app.feature.accounts.ui.components.AccountCard
+import com.vm.coinfold.app.feature.accounts.ui.components.AccountFormSheet
+import com.vm.coinfold.app.feature.accounts.ui.components.OperationSheet
+import com.vm.coinfold.app.feature.accounts.ui.components.TotalCard
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -113,77 +101,6 @@ private fun AccountsContent(
     }
 
     AccountDialogs(state, onIntent)
-}
-
-@Composable
-private fun TotalCard(state: AccountsState, onIntent: (AccountsIntent) -> Unit) {
-    val language = LocalAppLanguage.current
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(
-                stringResource(Res.string.accounts_total_balance),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-            Text(
-                text = state.total?.money?.format(language) ?: "",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-            if (state.total?.hasMissingRates == true) {
-                Text(
-                    stringResource(Res.string.accounts_rates_missing),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
-                )
-            }
-            CurrencySelector(
-                selected = state.mainCurrency,
-                onSelected = { onIntent(AccountsIntent.MainCurrencySelected(it)) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun AccountCard(item: AccountWithBalance, onIntent: (AccountsIntent) -> Unit) {
-    val language = LocalAppLanguage.current
-    val account = item.account
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        modifier = Modifier.fillMaxWidth().clickable { onIntent(AccountsIntent.EditAccountClicked(item)) },
-    ) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                ColorDot(account.color?.let { Color(it) } ?: MaterialTheme.colorScheme.primary, size = 14)
-                Column(Modifier.weight(1f)) {
-                    Text(account.name, style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        account.currency.code,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Text(
-                    item.balance.format(language),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-            Row {
-                TextButton(onClick = { onIntent(AccountsIntent.TopUpClicked(item)) }) {
-                    Text("+ " + stringResource(Res.string.accounts_top_up))
-                }
-                TextButton(onClick = { onIntent(AccountsIntent.WithdrawClicked(item)) }) {
-                    Text("− " + stringResource(Res.string.accounts_withdraw))
-                }
-            }
-        }
-    }
 }
 
 @Composable
