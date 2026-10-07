@@ -39,8 +39,9 @@ import coinfold.shared.generated.resources.field_name
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.shared.domain.models.Currency
-import com.vm.coinfold.app.shared.ui.components.ColorPicker
+import com.vm.coinfold.app.shared.ui.components.ColorGrid
 import com.vm.coinfold.app.shared.ui.components.CurrencySelector
+import com.vm.coinfold.app.shared.ui.components.ExtendedColorPalette
 import com.vm.coinfold.app.utils.parseAmount
 import org.jetbrains.compose.resources.stringResource
 
@@ -104,7 +105,12 @@ fun AccountFormSheet(
                 modifier = Modifier.fillMaxWidth(),
             )
             Text(stringResource(Res.string.field_color), style = MaterialTheme.typography.labelLarge)
-            ColorPicker(color, onSelected = { color = it })
+            // The color is optional: tapping the selected color again clears it.
+            ColorGrid(
+                colors = ExtendedColorPalette,
+                selected = color,
+                onSelected = { color = if (color == it) null else it },
+            )
             Spacer(Modifier.height(4.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 if (onDelete != null) {

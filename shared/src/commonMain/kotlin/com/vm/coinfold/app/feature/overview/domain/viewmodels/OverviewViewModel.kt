@@ -42,7 +42,8 @@ class OverviewViewModel(
         categoryRepository.categories,
         currencyRepository.rateTable,
         settingsRepository.settings,
-    ) { (period, transactions), categories, rates, settings ->
+        overviewRepository.observeAllExpenses(),
+    ) { (period, transactions), categories, rates, settings, history ->
         OverviewState(
             isLoading = false,
             period = period,
@@ -54,6 +55,8 @@ class OverviewViewModel(
                 period = period,
                 today = today(),
                 timeZone = TimeZone.currentSystemDefault(),
+                history = history,
+                periodStartDay = settings.periodStartDay,
             ),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), OverviewState())

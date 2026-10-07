@@ -7,4 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface OverviewRepository {
     /** All transactions inside [period], oldest first. */
     fun observeTransactions(period: Period): Flow<List<OverviewTransaction>>
+
+    /** Every expense ever recorded. */
+    fun observeAllExpenses(): Flow<List<OverviewTransaction>>
 }

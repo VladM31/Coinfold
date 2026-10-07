@@ -60,16 +60,47 @@ class OverviewCalculatorTest {
     }
 
     @Test
-    fun averagesUseElapsedDaysOfCurrentPeriod() {
+    fun dayAverageUsesElapsedDays() {
+        // 10 days passed: 1000.00 / 10 days = 100.00 per day
         val summary = calc(listOf(tx(TransactionType.EXPENSE, 1, Money(100_000, Currency.UAH), 3)), today = LocalDate(2026, 3, 10))
-        // 10 days passed: 1000.00 / 10 = 100.00 per day
         assertEquals(Money(10_000, Currency.UAH), summary.dayAverage)
-        assertEquals(Money(70_000, Currency.UAH), summary.weekAverage)
-        assertEquals(Money(310_000, Currency.UAH), summary.monthAverage)
 
         // a finished period is divided by its full length (31 days)
         val past = calc(listOf(tx(TransactionType.EXPENSE, 1, Money(31_000, Currency.UAH), 3)), today = LocalDate(2026, 5, 1))
         assertEquals(Money(1_000, Currency.UAH), past.dayAverage)
+    }
+
+    @Test
+    fun weekAverageIsActualSpendingPerStartedWeek() {
+        val expenses = listOf(tx(TransactionType.EXPENSE, 1, Money(78_000, Currency.UAH), 1))
+        // 2 days passed: one started week, so the average is simply what was spent, not 7 x the daily rate
+        assertEquals(Money(78_000, Currency.UAH), calc(expenses, today = LocalDate(2026, 3, 2)).weekAverage)
+        // 7 days: still one week
+        assertEquals(Money(78_000, Currency.UAH), calc(expenses, today = LocalDate(2026, 3, 7)).weekAverage)
+        // 8..14 days: two started weeks
+        assertEquals(Money(39_000, Currency.UAH), calc(expenses, today = LocalDate(2026, 3, 10)).weekAverage)
+    }
+
+    @Test
+    fun monthAverageIsTheMeanOfAllPeriodsWithExpenses() {
+        fun at(month: Int, amount: Long) = OverviewTransaction(
+            TransactionType.EXPENSE, 1, Money(amount, Currency.UAH),
+            Instant.parse("2026-%02d-10T12:00:00Z".format(month)).toEpochMilliseconds(),
+        )
+        val history = listOf(at(2, 100_000), at(3, 200_000), at(3, 100_000))
+        val summary = calculateOverview(
+            transactions = history.filter { it.dateTime >= Instant.parse("2026-03-01T00:00:00Z").toEpochMilliseconds() },
+            categories = listOf(food), rates = rates, mainCurrency = Currency.UAH, period = period,
+            today = LocalDate(2026, 3, 10), timeZone = TimeZone.UTC, history = history, periodStartDay = 1,
+        )
+        // February 1000.00 and March 3000.00 -> 2000.00 per month, nothing extrapolated
+        assertEquals(Money(200_000, Currency.UAH), summary.monthAverage)
+    }
+
+    @Test
+    fun monthAverageWithOnlyThePeriodEqualsItsSpending() {
+        val summary = calc(listOf(tx(TransactionType.EXPENSE, 1, Money(78_000, Currency.UAH), 1)), today = LocalDate(2026, 3, 2))
+        assertEquals(Money(78_000, Currency.UAH), summary.monthAverage)
     }
 
     @Test

@@ -13,4 +13,8 @@ interface OverviewDao {
             "WHERE dateTime >= :from AND dateTime < :to ORDER BY dateTime",
     )
     fun observeRows(from: Long, to: Long): Flow<List<OverviewRow>>
+
+    /** All expenses ever recorded, for averages over several periods. */
+    @Query("SELECT type, categoryId, currency, amountMinor, dateTime FROM transactions WHERE type = 'EXPENSE'")
+    fun observeAllExpenses(): Flow<List<OverviewRow>>
 }

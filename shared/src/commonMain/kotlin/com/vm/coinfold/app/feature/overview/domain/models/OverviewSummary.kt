@@ -29,7 +29,9 @@ data class OverviewSummary(
     val bars: List<DayBar>,
     val shares: List<CategoryShare>,
     val dayAverage: Money,
+    /** Spending so far per started week of the period. */
     val weekAverage: Money,
+    /** Average spending per period over all periods that have expenses. */
     val monthAverage: Money,
     /** True when some amounts could not be converted because no exchange rate is known. */
     val hasMissingRates: Boolean,

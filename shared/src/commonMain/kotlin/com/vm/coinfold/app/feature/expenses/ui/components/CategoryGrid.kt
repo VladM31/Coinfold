@@ -169,10 +169,14 @@ fun CategoryGrid(
                                 else -> localOrder = null
                             }
                         },
+                        // A long press that is released without moving is reported as a cancellation by the
+                        // gesture detector, so that is where "long press = edit" is handled.
                         onDragCancel = {
+                            val id = activeId
                             activeId = null
                             draggingId = null
                             localOrder = null
+                            if (id != null && moved < DRAG_THRESHOLD) categories[id]?.let { editHandler(it) }
                         },
                     )
                 },

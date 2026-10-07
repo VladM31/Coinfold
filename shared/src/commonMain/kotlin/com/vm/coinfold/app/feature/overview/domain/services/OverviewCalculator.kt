@@ -27,8 +27,9 @@ private fun divideRounded(value: Long, divisor: Long): Long = (value + divisor /
  * Builds the statistics of one [period] in [mainCurrency]: income, spending, spending per day split by
  * category, the share of each category and average spending per day/week/month.
  *
- * Averages divide by the days that have already passed in the period ([today] decides), so the current
- * period is not diluted by days that have not happened yet.
+ * The day average divides by the days that have already passed in the period ([today] decides), so the
+ * current period is not diluted by days that have not happened yet. Week and month averages are based on
+ * actual spending only (see below) and are never extrapolated.
  */
 @OptIn(ExperimentalTime::class)
 fun calculateOverview(
@@ -39,6 +40,9 @@ fun calculateOverview(
     period: Period,
     today: LocalDate,
     timeZone: TimeZone,
+    /** Every expense ever recorded; used for the monthly average. */
+    history: List<OverviewTransaction> = transactions,
+    periodStartDay: Int = 1,
 ): OverviewSummary {
     val zero = Money.zero(mainCurrency)
     val activeIds = categories.mapTo(HashSet()) { it.id }
@@ -92,8 +96,11 @@ fun calculateOverview(
         else -> period.start.daysUntil(today) + 1
     }.coerceAtLeast(1)
     val dayAverage = Money(divideRounded(spent.minorUnits, elapsedDays.toLong()), mainCurrency)
-    val weekAverage = Money(divideRounded(spent.minorUnits * 7, elapsedDays.toLong()), mainCurrency)
-    val monthAverage = Money(divideRounded(spent.minorUnits * lengthDays, elapsedDays.toLong()), mainCurrency)
+    // Week: spending so far divided by the weeks that have been started, so the first days of a period show
+    // what was actually spent instead of a projection.
+    val startedWeeks = (elapsedDays + 6) / 7
+    val weekAverage = Money(divideRounded(spent.minorUnits, startedWeeks.toLong()), mainCurrency)
+    val monthAverage = averageMonthlySpending(history, rates, mainCurrency, periodStartDay, timeZone)
 
     return OverviewSummary(
         mainCurrency = mainCurrency,
@@ -110,3 +117,27 @@ fun calculateOverview(
 
 private fun percentOf(part: Money, total: Money): Int =
     if (total.minorUnits <= 0) 0 else divideRounded(part.minorUnits * 100, total.minorUnits).toInt()
+
+/**
+ * Average spending per calculation period over all periods that have expenses (the current one counts with
+ * what has been spent so far). Nothing is extrapolated; with a single period it equals that period's spending.
+ */
+@OptIn(ExperimentalTime::class)
+private fun averageMonthlySpending(
+    history: List<OverviewTransaction>,
+    rates: RateTable,
+    mainCurrency: Currency,
+    periodStartDay: Int,
+    timeZone: TimeZone,
+): Money {
+    val perPeriod = HashMap<LocalDate, Long>()
+    for (tx in history) {
+        if (tx.type != TransactionType.EXPENSE) continue
+        val converted = rates.convert(tx.money, mainCurrency)?.money ?: continue
+        val date = Instant.fromEpochMilliseconds(tx.dateTime).toLocalDateTime(timeZone).date
+        val start = Period.containing(date, periodStartDay).start
+        perPeriod[start] = (perPeriod[start] ?: 0L) + converted.minorUnits
+    }
+    if (perPeriod.isEmpty()) return Money.zero(mainCurrency)
+    return Money(divideRounded(perPeriod.values.sum(), perPeriod.size.toLong()), mainCurrency)
+}

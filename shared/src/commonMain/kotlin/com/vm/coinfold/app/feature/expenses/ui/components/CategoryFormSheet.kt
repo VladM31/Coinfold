@@ -24,6 +24,8 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -51,9 +53,13 @@ import com.vm.coinfold.app.feature.expenses.domain.models.CategoryIcons
 import com.vm.coinfold.app.shared.ui.components.CategoryBadge
 import com.vm.coinfold.app.shared.ui.components.CategoryIcon
 import com.vm.coinfold.app.shared.ui.components.CategoryIconCatalog
+import com.vm.coinfold.app.shared.ui.components.ColorGrid
 import com.vm.coinfold.app.shared.ui.components.ColorPalette
-import com.vm.coinfold.app.shared.ui.components.ColorPicker
+import com.vm.coinfold.app.shared.ui.components.ExtendedColorPalette
 import org.jetbrains.compose.resources.stringResource
+
+private const val TAB_ICON = 0
+private const val TAB_COLOR = 1
 
 /** Create ([category] == null) or edit a category; editing also offers reordering and delete. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -69,6 +75,7 @@ fun CategoryFormSheet(
     var icon by remember { mutableStateOf(category?.icon ?: CategoryIcons.default) }
     // Open on the tab that contains the current icon.
     var showEmoji by remember { mutableStateOf(CategoryIconCatalog.find(icon) == null) }
+    var tab by remember { mutableStateOf(TAB_ICON) }
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
@@ -104,41 +111,58 @@ fun CategoryFormSheet(
                     Text(stringResource(Res.string.action_save))
                 }
             }
-            Text(stringResource(Res.string.field_color), style = MaterialTheme.typography.labelLarge)
-            ColorPicker(selected = color, onSelected = { color = it ?: color })
-            Text(stringResource(Res.string.category_icon), style = MaterialTheme.typography.labelLarge)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(
-                    selected = !showEmoji,
-                    onClick = { showEmoji = false },
-                    label = { Text(stringResource(Res.string.category_icon_tab_icons)) },
+            // Two tabs, like the reference: the icon list and the 160-color grid are both long.
+            TabRow(selectedTabIndex = tab) {
+                Tab(
+                    selected = tab == TAB_ICON,
+                    onClick = { tab = TAB_ICON },
+                    text = { Text(stringResource(Res.string.category_icon)) },
                 )
-                FilterChip(
-                    selected = showEmoji,
-                    onClick = { showEmoji = true },
-                    label = { Text(stringResource(Res.string.category_icon_tab_emoji)) },
+                Tab(
+                    selected = tab == TAB_COLOR,
+                    onClick = { tab = TAB_COLOR },
+                    text = { Text(stringResource(Res.string.field_color)) },
                 )
             }
-            val candidates = if (showEmoji) {
-                CategoryIcons.all
+            if (tab == TAB_COLOR) {
+                ColorGrid(colors = ExtendedColorPalette, selected = color, onSelected = { color = it })
             } else {
-                CategoryIconCatalog.icons.map { (key, _) -> CategoryIconCatalog.stored(key) }
-            }
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                candidates.forEach { candidate ->
-                    val selected = candidate == icon
-                    Box(
-                        Modifier
-                            .size(44.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .then(
-                                if (selected) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                                else Modifier,
-                            )
-                            .clickable { icon = candidate },
-                        contentAlignment = Alignment.Center,
-                    ) { CategoryIcon(candidate, tint = MaterialTheme.colorScheme.onSurface, size = 24) }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = !showEmoji,
+                        onClick = { showEmoji = false },
+                        label = { Text(stringResource(Res.string.category_icon_tab_icons)) },
+                    )
+                    FilterChip(
+                        selected = showEmoji,
+                        onClick = { showEmoji = true },
+                        label = { Text(stringResource(Res.string.category_icon_tab_emoji)) },
+                    )
+                }
+                val candidates = if (showEmoji) {
+                    CategoryIcons.all
+                } else {
+                    CategoryIconCatalog.icons.map { (key, _) -> CategoryIconCatalog.stored(key) }
+                }
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    candidates.forEach { candidate ->
+                        val selected = candidate == icon
+                        Box(
+                            Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .then(
+                                    if (selected) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                    else Modifier,
+                                )
+                                .clickable { icon = candidate },
+                            contentAlignment = Alignment.Center,
+                        ) { CategoryIcon(candidate, tint = MaterialTheme.colorScheme.onSurface, size = 24) }
+                    }
                 }
             }
             Spacer(Modifier.height(16.dp))
