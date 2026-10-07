@@ -1,17 +1,19 @@
 package com.vm.coinfold.app.config
 
-import com.vm.coinfold.app.feature.accounts.main.AccountRepository
-import com.vm.coinfold.app.feature.accounts.main.AccountRepositoryImpl
-import com.vm.coinfold.app.feature.accounts.main.AccountsViewModel
-import com.vm.coinfold.app.feature.expenses.main.CategoryRepository
-import com.vm.coinfold.app.feature.expenses.main.CategoryRepositoryImpl
-import com.vm.coinfold.app.feature.expenses.main.ExpenseStatsRepository
-import com.vm.coinfold.app.feature.expenses.main.ExpenseStatsRepositoryImpl
-import com.vm.coinfold.app.feature.expenses.main.ExpensesViewModel
-import com.vm.coinfold.app.feature.transactions.main.AddExpenseUseCase
-import com.vm.coinfold.app.feature.transactions.main.AddManualTransactionUseCase
-import com.vm.coinfold.app.feature.transactions.main.TransactionRepository
-import com.vm.coinfold.app.feature.transactions.main.TransactionRepositoryImpl
+import com.vm.coinfold.app.feature.accounts.domain.repositories.AccountRepository
+import com.vm.coinfold.app.feature.accounts.domain.repositories.impls.AccountRepositoryImpl
+import com.vm.coinfold.app.feature.accounts.domain.viewmodels.AccountsViewModel
+import com.vm.coinfold.app.feature.expenses.domain.repositories.CategoryRepository
+import com.vm.coinfold.app.feature.expenses.domain.repositories.ExpenseStatsRepository
+import com.vm.coinfold.app.feature.expenses.domain.repositories.impls.CategoryRepositoryImpl
+import com.vm.coinfold.app.feature.expenses.domain.repositories.impls.ExpenseStatsRepositoryImpl
+import com.vm.coinfold.app.feature.expenses.domain.viewmodels.ExpensesViewModel
+import com.vm.coinfold.app.feature.transactions.domain.repositories.TransactionRepository
+import com.vm.coinfold.app.feature.transactions.domain.repositories.impls.TransactionRepositoryImpl
+import com.vm.coinfold.app.feature.transactions.domain.usecases.AddExpenseUseCase
+import com.vm.coinfold.app.feature.transactions.domain.usecases.AddManualTransactionUseCase
+import com.vm.coinfold.app.feature.transactions.domain.usecases.UpdateTransactionUseCase
+import com.vm.coinfold.app.feature.transactions.domain.viewmodels.TransactionsViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -24,6 +26,8 @@ val transactionsModule = module {
     single<TransactionRepository> { TransactionRepositoryImpl(get()) }
     factory { AddManualTransactionUseCase(get()) }
     factory { AddExpenseUseCase(get(), get()) }
+    factory { UpdateTransactionUseCase(get(), get()) }
+    viewModelOf(::TransactionsViewModel)
 }
 
 val expensesModule = module {

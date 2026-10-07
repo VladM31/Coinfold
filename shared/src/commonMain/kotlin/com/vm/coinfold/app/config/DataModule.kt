@@ -5,9 +5,9 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.vm.coinfold.app.feature.settings.db.SettingsStorage
-import com.vm.coinfold.app.feature.settings.main.SettingsRepository
-import com.vm.coinfold.app.feature.settings.main.SettingsRepositoryImpl
+import com.vm.coinfold.app.feature.settings.db.storages.SettingsStorage
+import com.vm.coinfold.app.feature.settings.domain.repositories.SettingsRepository
+import com.vm.coinfold.app.feature.settings.domain.repositories.impls.SettingsRepositoryImpl
 import com.vm.coinfold.app.shared.db.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import okio.Path.Companion.toPath

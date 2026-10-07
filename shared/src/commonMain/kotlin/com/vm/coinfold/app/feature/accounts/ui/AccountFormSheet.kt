@@ -37,8 +37,8 @@ import coinfold.shared.generated.resources.field_color
 import coinfold.shared.generated.resources.field_currency
 import coinfold.shared.generated.resources.field_name
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import com.vm.coinfold.app.feature.accounts.main.AccountWithBalance
-import com.vm.coinfold.app.shared.domain.Currency
+import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
+import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.ui.ColorPicker
 import com.vm.coinfold.app.shared.ui.CurrencySelector
 import com.vm.coinfold.app.utils.parseAmount

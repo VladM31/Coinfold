@@ -5,15 +5,16 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
-import com.vm.coinfold.app.feature.accounts.db.AccountDao
-import com.vm.coinfold.app.feature.accounts.db.AccountEntity
-import com.vm.coinfold.app.feature.currency.db.RateDao
-import com.vm.coinfold.app.feature.currency.db.RateEntity
-import com.vm.coinfold.app.feature.expenses.db.CategoryDao
-import com.vm.coinfold.app.feature.expenses.db.CategoryEntity
-import com.vm.coinfold.app.feature.expenses.db.ExpenseStatsDao
-import com.vm.coinfold.app.feature.transactions.db.TransactionDao
-import com.vm.coinfold.app.feature.transactions.db.TransactionEntity
+import com.vm.coinfold.app.feature.accounts.db.daos.AccountDao
+import com.vm.coinfold.app.feature.accounts.db.entities.AccountEntity
+import com.vm.coinfold.app.feature.currency.db.daos.RateDao
+import com.vm.coinfold.app.feature.currency.db.entities.RateEntity
+import com.vm.coinfold.app.feature.expenses.db.daos.CategoryDao
+import com.vm.coinfold.app.feature.expenses.db.daos.ExpenseStatsDao
+import com.vm.coinfold.app.feature.expenses.db.entities.CategoryEntity
+import com.vm.coinfold.app.feature.transactions.db.daos.TransactionDao
+import com.vm.coinfold.app.feature.transactions.db.entities.TransactionEntity
+import com.vm.coinfold.app.shared.db.converters.Converters
 
 /** The single database of the app; every feature registers its DAO here. */
 @Database(

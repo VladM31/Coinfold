@@ -2,15 +2,16 @@ package com.vm.coinfold.app
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.intl.Locale
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -20,15 +21,17 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.vm.coinfold.app.config.Route
 import com.vm.coinfold.app.feature.accounts.ui.AccountsScreen
-import com.vm.coinfold.app.feature.currency.main.CurrencyRepository
+import com.vm.coinfold.app.feature.currency.domain.repositories.CurrencyRepository
 import com.vm.coinfold.app.feature.expenses.ui.ExpensesScreen
-import com.vm.coinfold.app.feature.settings.main.AppLanguage
-import com.vm.coinfold.app.feature.settings.main.Settings
-import com.vm.coinfold.app.feature.settings.main.SettingsRepository
-import com.vm.coinfold.app.feature.settings.main.ThemeMode
-import com.vm.coinfold.app.shared.domain.ResolvedLanguage
+import com.vm.coinfold.app.feature.settings.domain.models.AppLanguage
+import com.vm.coinfold.app.feature.settings.domain.models.Settings
+import com.vm.coinfold.app.feature.settings.domain.models.ThemeMode
+import com.vm.coinfold.app.feature.settings.domain.repositories.SettingsRepository
+import com.vm.coinfold.app.feature.transactions.ui.TransactionsScreen
+import com.vm.coinfold.app.shared.domain.models.ResolvedLanguage
 import com.vm.coinfold.app.shared.ui.ComingSoon
 import com.vm.coinfold.app.shared.ui.LocalAppLanguage
+import com.vm.coinfold.app.shared.ui.NavIcon
 import com.vm.coinfold.app.shared.ui.theme.CoinfoldTheme
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -70,7 +73,13 @@ fun App() {
                                     restoreState = true
                                 }
                             },
-                            icon = { Text(route.glyph) },
+                            icon = {
+                                NavIcon(
+                                    kind = route.icon,
+                                    tint = if (current == route.path) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            },
                             label = { Text(stringResource(route.label)) },
                         )
                     }
@@ -83,6 +92,7 @@ fun App() {
                         when (route) {
                             Route.Accounts -> AccountsScreen()
                             Route.Expenses -> ExpensesScreen()
+                            Route.Transactions -> TransactionsScreen()
                             else -> ComingSoon(stringResource(route.label))
                         }
                     }

@@ -40,10 +40,10 @@ import coinfold.shared.generated.resources.field_amount
 import coinfold.shared.generated.resources.field_currency
 import coinfold.shared.generated.resources.field_note
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import com.vm.coinfold.app.feature.accounts.main.AccountWithBalance
-import com.vm.coinfold.app.feature.expenses.main.Category
-import com.vm.coinfold.app.shared.domain.Currency
-import com.vm.coinfold.app.shared.domain.Money
+import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
+import com.vm.coinfold.app.feature.expenses.domain.models.Category
+import com.vm.coinfold.app.shared.domain.models.Currency
+import com.vm.coinfold.app.shared.domain.models.Money
 import com.vm.coinfold.app.shared.ui.CurrencySelector
 import com.vm.coinfold.app.shared.ui.DateField
 import com.vm.coinfold.app.utils.Calculator

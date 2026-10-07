@@ -1,16 +1,16 @@
 package com.vm.coinfold.app.utils
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import com.vm.coinfold.app.shared.domain.Currency
-import com.vm.coinfold.app.shared.domain.Money
-import com.vm.coinfold.app.shared.domain.ResolvedLanguage
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
+import com.vm.coinfold.app.shared.domain.models.Currency
+import com.vm.coinfold.app.shared.domain.models.Money
+import com.vm.coinfold.app.shared.domain.models.ResolvedLanguage
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 
 class FormattingTest {
     @Test

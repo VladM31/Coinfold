@@ -1,7 +1,7 @@
 package com.vm.coinfold.app.utils
 
-import com.vm.coinfold.app.shared.domain.Money
-import com.vm.coinfold.app.shared.domain.ResolvedLanguage
+import com.vm.coinfold.app.shared.domain.models.Money
+import com.vm.coinfold.app.shared.domain.models.ResolvedLanguage
 
 private const val NBSP = ' '
 

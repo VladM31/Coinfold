@@ -61,4 +61,28 @@
     <string name="expense_account">Account</string>
     <string name="expense_no_accounts">Create an account first (Accounts tab) to add expenses.</string>
     <string name="expense_no_rate">No exchange rate available yet. Connect to the internet once, or use the currency of the account.</string>
+
+    <!-- Transactions -->
+    <string name="transactions_title">Transactions</string>
+    <string name="transactions_empty">No transactions yet</string>
+    <string name="transactions_filter">Filter</string>
+    <string name="transactions_filter_reset">Reset</string>
+    <string name="transaction_manual_withdrawal">Withdrawal</string>
+    <string name="transaction_edit_title">Edit transaction</string>
+    <string name="transaction_delete_title">Delete transaction?</string>
+    <string name="transaction_delete_message">The account balance will be recalculated.</string>
+    <string name="transaction_deleted">Transaction deleted</string>
+    <string name="filter_period">Period</string>
+    <string name="filter_period_all">All time</string>
+    <string name="filter_period_current">Current period</string>
+    <string name="filter_period_custom">Custom</string>
+    <string name="filter_from">From</string>
+    <string name="filter_to">to</string>
+    <string name="filter_type">Type</string>
+    <string name="filter_account">Account</string>
+    <string name="filter_category">Category</string>
+    <string name="filter_all">All</string>
+    <string name="filter_apply">Apply</string>
+    <string name="type_income">Income</string>
+    <string name="type_expense">Expense</string>
 </resources>

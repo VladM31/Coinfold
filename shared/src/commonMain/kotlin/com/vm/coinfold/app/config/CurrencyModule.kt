@@ -1,11 +1,11 @@
 package com.vm.coinfold.app.config
 
-import com.vm.coinfold.app.feature.currency.main.ConvertMoneyUseCase
-import com.vm.coinfold.app.feature.currency.main.CurrencyRepository
-import com.vm.coinfold.app.feature.currency.main.CurrencyRepositoryImpl
-import com.vm.coinfold.app.feature.currency.main.GetRateUseCase
-import com.vm.coinfold.app.feature.currency.net.CurrencyClient
-import com.vm.coinfold.app.feature.currency.net.MonobankCurrencyClient
+import com.vm.coinfold.app.feature.currency.domain.repositories.CurrencyRepository
+import com.vm.coinfold.app.feature.currency.domain.repositories.impls.CurrencyRepositoryImpl
+import com.vm.coinfold.app.feature.currency.domain.usecases.ConvertMoneyUseCase
+import com.vm.coinfold.app.feature.currency.domain.usecases.GetRateUseCase
+import com.vm.coinfold.app.feature.currency.net.clients.CurrencyClient
+import com.vm.coinfold.app.feature.currency.net.clients.impls.MonobankCurrencyClient
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpTimeout

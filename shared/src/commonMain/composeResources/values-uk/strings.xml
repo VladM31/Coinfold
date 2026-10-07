@@ -61,4 +61,28 @@
     <string name="expense_account">Рахунок</string>
     <string name="expense_no_accounts">Спочатку створіть рахунок (вкладка «Рахунки»), щоб додавати витрати.</string>
     <string name="expense_no_rate">Курс валют ще недоступний. Підключіться до інтернету або використайте валюту рахунку.</string>
+
+    <!-- Transactions -->
+    <string name="transactions_title">Транзакції</string>
+    <string name="transactions_empty">Ще немає транзакцій</string>
+    <string name="transactions_filter">Фільтр</string>
+    <string name="transactions_filter_reset">Скинути</string>
+    <string name="transaction_manual_withdrawal">Списання</string>
+    <string name="transaction_edit_title">Редагувати транзакцію</string>
+    <string name="transaction_delete_title">Видалити транзакцію?</string>
+    <string name="transaction_delete_message">Баланс рахунку буде перераховано.</string>
+    <string name="transaction_deleted">Транзакцію видалено</string>
+    <string name="filter_period">Період</string>
+    <string name="filter_period_all">Увесь час</string>
+    <string name="filter_period_current">Поточний період</string>
+    <string name="filter_period_custom">Свій</string>
+    <string name="filter_from">З</string>
+    <string name="filter_to">по</string>
+    <string name="filter_type">Тип</string>
+    <string name="filter_account">Рахунок</string>
+    <string name="filter_category">Категорія</string>
+    <string name="filter_all">Усі</string>
+    <string name="filter_apply">Застосувати</string>
+    <string name="type_income">Надходження</string>
+    <string name="type_expense">Витрата</string>
 </resources>

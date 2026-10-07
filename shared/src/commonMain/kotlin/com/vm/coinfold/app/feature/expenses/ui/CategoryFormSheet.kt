@@ -45,8 +45,8 @@ import coinfold.shared.generated.resources.category_move_later
 import coinfold.shared.generated.resources.category_new_title
 import coinfold.shared.generated.resources.field_color
 import coinfold.shared.generated.resources.field_name
-import com.vm.coinfold.app.feature.expenses.main.Category
-import com.vm.coinfold.app.feature.expenses.main.CategoryIcons
+import com.vm.coinfold.app.feature.expenses.domain.models.Category
+import com.vm.coinfold.app.feature.expenses.domain.models.CategoryIcons
 import com.vm.coinfold.app.shared.ui.ColorPalette
 import com.vm.coinfold.app.shared.ui.ColorPicker
 import org.jetbrains.compose.resources.stringResource

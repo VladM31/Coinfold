@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.action_cancel
 import coinfold.shared.generated.resources.action_save
-import com.vm.coinfold.app.shared.domain.Currency
-import com.vm.coinfold.app.shared.domain.ResolvedLanguage
+import com.vm.coinfold.app.shared.domain.models.Currency
+import com.vm.coinfold.app.shared.domain.models.ResolvedLanguage
 import com.vm.coinfold.app.utils.dateFromPickerMillis
 import com.vm.coinfold.app.utils.format
 import com.vm.coinfold.app.utils.pickerMillisFor
