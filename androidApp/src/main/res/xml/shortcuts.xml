@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+            android:shortcutId="add_expense"
+            android:enabled="true"
+            android:icon="@drawable/ic_shortcut_expense"
+            android:shortcutShortLabel="@string/shortcut_add_expense_short"
+            android:shortcutLongLabel="@string/shortcut_add_expense_long">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.vm.coinfold.app"
+                android:targetClass="com.vm.coinfold.app.MainActivity">
+            <extra android:name="coinfold_action" android:value="add_expense"/>
+        </intent>
+    </shortcut>
+    <shortcut
+            android:shortcutId="add_income"
+            android:enabled="true"
+            android:icon="@drawable/ic_shortcut_income"
+            android:shortcutShortLabel="@string/shortcut_add_income_short"
+            android:shortcutLongLabel="@string/shortcut_add_income_long">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.vm.coinfold.app"
+                android:targetClass="com.vm.coinfold.app.MainActivity">
+            <extra android:name="coinfold_action" android:value="add_income"/>
+        </intent>
+    </shortcut>
+</shortcuts>

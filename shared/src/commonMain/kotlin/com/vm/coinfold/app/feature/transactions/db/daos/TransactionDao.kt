@@ -63,6 +63,13 @@ interface TransactionDao {
     )
     fun observeNoteStats(): Flow<List<NoteStatRow>>
 
+    /** Category of the most recent categorized expense; the quick-add shortcut opens on it. */
+    @Query(
+        "SELECT categoryId FROM transactions WHERE type = 'EXPENSE' AND categoryId IS NOT NULL " +
+            "ORDER BY dateTime DESC, id DESC LIMIT 1",
+    )
+    suspend fun lastExpenseCategoryId(): Long?
+
     @Insert
     suspend fun insert(transaction: TransactionEntity): Long
 

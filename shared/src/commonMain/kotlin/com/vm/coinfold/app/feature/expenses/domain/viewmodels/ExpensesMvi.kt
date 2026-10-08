@@ -44,6 +44,9 @@ sealed interface ExpensesIntent {
     data class DeleteCategoryClicked(val category: Category) : ExpensesIntent
     data object ConfirmDeleteCategory : ExpensesIntent
     data object UndoDeleteCategory : ExpensesIntent
+
+    /** From the icon shortcut or the widget: open the expense sheet on the category used last. */
+    data object QuickAddExpense : ExpensesIntent
     data class ReorderCategories(val ids: List<Long>) : ExpensesIntent
     data class SaveExpense(
         val amount: BigDecimal,

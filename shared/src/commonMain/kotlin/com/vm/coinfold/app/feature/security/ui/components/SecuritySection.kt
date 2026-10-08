@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.security_biometric
+import coinfold.shared.generated.resources.security_biometric_unavailable
 import coinfold.shared.generated.resources.security_change_pin
 import coinfold.shared.generated.resources.security_hint
 import coinfold.shared.generated.resources.security_pin_on
@@ -31,6 +32,8 @@ fun SecuritySection(
     state: SecurityState,
     biometricAvailable: Boolean,
     onIntent: (SecurityIntent) -> Unit,
+    /** Turning it on first asks the device to recognise the user once, to prove it works. */
+    onBiometricToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -54,18 +57,23 @@ fun SecuritySection(
                     Text(stringResource(Res.string.security_turn_off), color = MaterialTheme.colorScheme.error)
                 }
             }
-            if (biometricAvailable) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        stringResource(Res.string.security_biometric),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Switch(
-                        checked = state.biometricEnabled,
-                        onCheckedChange = { onIntent(SecurityIntent.BiometricToggled(it)) },
-                    )
+            // Always shown; it is only usable when the device has a fingerprint or face enrolled.
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(Res.string.security_biometric), style = MaterialTheme.typography.bodyMedium)
+                    if (!biometricAvailable) {
+                        Text(
+                            stringResource(Res.string.security_biometric_unavailable),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
+                Switch(
+                    checked = state.biometricEnabled && biometricAvailable,
+                    enabled = biometricAvailable,
+                    onCheckedChange = onBiometricToggle,
+                )
             }
         }
     }

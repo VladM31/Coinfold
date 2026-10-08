@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Coinfold</string>
+    <string name="shortcut_add_expense_short">Витрата</string>
+    <string name="shortcut_add_expense_long">Додати витрату</string>
+    <string name="shortcut_add_income_short">Надходження</string>
+    <string name="shortcut_add_income_long">Поповнити рахунок</string>
+    <string name="widget_description">Залишок за період і кнопка швидкої витрати</string>
+</resources>

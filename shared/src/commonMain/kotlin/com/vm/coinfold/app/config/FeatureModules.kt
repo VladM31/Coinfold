@@ -13,6 +13,7 @@ import com.vm.coinfold.app.feature.expenses.domain.repositories.CategoryReposito
 import com.vm.coinfold.app.feature.expenses.domain.repositories.ExpenseStatsRepository
 import com.vm.coinfold.app.feature.expenses.domain.repositories.impls.CategoryRepositoryImpl
 import com.vm.coinfold.app.feature.expenses.domain.repositories.impls.ExpenseStatsRepositoryImpl
+import com.vm.coinfold.app.feature.expenses.domain.usecases.GetPeriodBalanceUseCase
 import com.vm.coinfold.app.feature.expenses.domain.usecases.SeedDefaultCategoriesUseCase
 import com.vm.coinfold.app.feature.expenses.domain.viewmodels.ExpensesViewModel
 import com.vm.coinfold.app.feature.overview.domain.repositories.OverviewRepository
@@ -55,6 +56,7 @@ val expensesModule = module {
     single<CategoryRepository> { CategoryRepositoryImpl(get()) }
     single<ExpenseStatsRepository> { ExpenseStatsRepositoryImpl(get()) }
     factory { SeedDefaultCategoriesUseCase(get(), get()) }
+    factory { GetPeriodBalanceUseCase(get(), get(), get(), get()) }
     viewModelOf(::ExpensesViewModel)
 }
 

@@ -240,6 +240,7 @@
     <string name="security_change_pin">Змінити PIN</string>
     <string name="security_turn_off">Вимкнути</string>
     <string name="security_biometric">Розблокування відбитком або обличчям</string>
+    <string name="security_biometric_unavailable">Спершу налаштуйте відбиток або обличчя в налаштуваннях пристрою</string>
     <string name="pin_current">Введіть поточний PIN</string>
     <string name="pin_new">Введіть новий PIN</string>
     <string name="pin_confirm">Повторіть новий PIN</string>
@@ -252,4 +253,10 @@
     <string name="biometric_title">Розблокувати Coinfold</string>
     <string name="biometric_subtitle">Підтвердіть, що це ви</string>
     <string name="biometric_cancel">Ввести PIN</string>
+
+    <!-- Quick add -->
+    <string name="voice_prompt">Скажіть суму та примітку, наприклад: 150 грн Сільпо</string>
+    <string name="widget_title">Залишок за період</string>
+    <string name="widget_add_expense">+ Витрата</string>
+    <string name="widget_hidden">•••••</string>
 </resources>

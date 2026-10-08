@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -65,6 +66,9 @@ class AccountsViewModel(
             is AccountsIntent.SaveAccount -> saveAccount(intent)
             AccountsIntent.ConfirmDelete -> confirmDelete()
             AccountsIntent.UndoDelete -> viewModelScope.launch { accountRepository.undoDelete() }
+            AccountsIntent.QuickAddIncome -> viewModelScope.launch {
+                accountRepository.accounts.first().firstOrNull()?.let { dialog.value = AccountsDialog.Operation(it) }
+            }
             is AccountsIntent.SaveOperation -> saveOperation(intent)
         }
     }

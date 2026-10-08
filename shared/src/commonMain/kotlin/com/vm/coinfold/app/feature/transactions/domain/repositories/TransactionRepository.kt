@@ -59,6 +59,9 @@ interface TransactionRepository {
 
     suspend fun delete(id: Long)
 
+    /** Category of the latest categorized expense, or null if there is none yet. */
+    suspend fun lastExpenseCategoryId(): Long?
+
     /** Brings back the transaction removed by the last [delete]. */
     suspend fun undoDelete()
 

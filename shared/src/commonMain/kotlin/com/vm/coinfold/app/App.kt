@@ -48,6 +48,9 @@ import com.vm.coinfold.app.feature.settings.domain.repositories.SettingsReposito
 import com.vm.coinfold.app.feature.settings.ui.screens.SettingsScreen
 import com.vm.coinfold.app.feature.transactions.ui.screens.TransactionsScreen
 import com.vm.coinfold.app.shared.domain.models.ResolvedLanguage
+import com.vm.coinfold.app.shared.launch.LaunchAction
+import com.vm.coinfold.app.shared.launch.LaunchActions
+import com.vm.coinfold.app.shared.platform.HomeWidgets
 import com.vm.coinfold.app.shared.platform.SecureWindowEffect
 import com.vm.coinfold.app.shared.ui.components.LocalAppLanguage
 import com.vm.coinfold.app.shared.ui.components.NavIcon
@@ -72,7 +75,11 @@ fun App() {
     val lockStatus by lock.status.collectAsState()
     val isProtected by lock.isProtected.collectAsState()
     var covered by remember { mutableStateOf(false) }
-    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { lock.onBackground() }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+        lock.onBackground()
+        // numbers on the home screen widget should match what the user just saw
+        HomeWidgets.refresh()
+    }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { covered = true }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { covered = false }
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
@@ -117,6 +124,22 @@ fun App() {
         CoinfoldTheme(darkTheme = darkTheme) {
             // The controller lives outside the key, so switching language keeps the current tab.
             val navController = rememberNavController()
+            // Shortcuts and the widget start on the tab that handles them (the screen then consumes the request).
+            val launchAction by LaunchActions.pending.collectAsState()
+            LaunchedEffect(launchAction) {
+                val route = when (launchAction) {
+                    LaunchAction.ADD_EXPENSE -> Route.Expenses
+                    LaunchAction.ADD_INCOME -> Route.Accounts
+                    null -> null
+                }
+                if (route != null) {
+                    navController.navigate(route.path) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
             Box(Modifier.fillMaxSize()) {
                 key(localeTag) { AppScaffold(navController) }
                 // The lock screen is drawn over the app, so the screen the user was on is still there afterwards.

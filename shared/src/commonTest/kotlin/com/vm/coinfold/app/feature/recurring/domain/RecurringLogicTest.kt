@@ -70,6 +70,7 @@ class RecurringLogicTest {
         override suspend fun setActive(id: Long, active: Boolean) = Unit
         override suspend fun delete(id: Long) = Unit
         override suspend fun undoDelete() = Unit
+        override suspend fun lastExpenseCategoryId(): Long? = null
         override suspend fun due(today: LocalDate) = items.filter { it.isActive && it.nextDate <= today }
         override suspend fun setNextDate(id: Long, nextDate: LocalDate) {
             val i = items.indexOfFirst { it.id == id }

@@ -120,6 +120,8 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         dao.delete(id)
     }
 
+    override suspend fun lastExpenseCategoryId(): Long? = dao.lastExpenseCategoryId()
+
     override suspend fun undoDelete() {
         val entity = lastDeleted ?: return
         lastDeleted = null

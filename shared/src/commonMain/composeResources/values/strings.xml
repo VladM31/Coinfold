@@ -240,6 +240,7 @@
     <string name="security_change_pin">Change PIN</string>
     <string name="security_turn_off">Turn off</string>
     <string name="security_biometric">Unlock with fingerprint or face</string>
+    <string name="security_biometric_unavailable">Set up a fingerprint or face in your device settings first</string>
     <string name="pin_current">Enter your current PIN</string>
     <string name="pin_new">Enter a new PIN</string>
     <string name="pin_confirm">Repeat the new PIN</string>
@@ -252,4 +253,10 @@
     <string name="biometric_title">Unlock Coinfold</string>
     <string name="biometric_subtitle">Confirm it is you</string>
     <string name="biometric_cancel">Use PIN</string>
+
+    <!-- Quick add -->
+    <string name="voice_prompt">Say the amount and a note, for example: 150 UAH Silpo</string>
+    <string name="widget_title">Left this period</string>
+    <string name="widget_add_expense">+ Expense</string>
+    <string name="widget_hidden">•••••</string>
 </resources>

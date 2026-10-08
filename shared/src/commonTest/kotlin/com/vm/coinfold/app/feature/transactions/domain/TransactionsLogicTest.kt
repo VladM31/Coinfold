@@ -95,6 +95,7 @@ class TransactionsLogicTest {
         }
         override suspend fun delete(id: Long) = Unit
         override suspend fun undoDelete() = Unit
+        override suspend fun lastExpenseCategoryId(): Long? = null
         override suspend fun duplicate(id: Long, dateTime: Long) = true
     }
 

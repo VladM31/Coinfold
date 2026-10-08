@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Coinfold</string>
+    <string name="shortcut_add_expense_short">Add expense</string>
+    <string name="shortcut_add_expense_long">Add an expense</string>
+    <string name="shortcut_add_income_short">Add income</string>
+    <string name="shortcut_add_income_long">Top up an account</string>
+    <string name="widget_description">What is left this period, with a quick expense button</string>
 </resources>

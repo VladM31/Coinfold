@@ -16,8 +16,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -28,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,15 +48,19 @@ import coinfold.shared.generated.resources.expense_amount_label
 import coinfold.shared.generated.resources.expense_no_accounts
 import coinfold.shared.generated.resources.expense_notes
 import coinfold.shared.generated.resources.expense_withdrawal
+import coinfold.shared.generated.resources.voice_prompt
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.currency.domain.models.RateTable
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
+import com.vm.coinfold.app.feature.expenses.domain.services.parseSpokenExpense
 import com.vm.coinfold.app.feature.transactions.domain.models.NoteSuggestion
 import com.vm.coinfold.app.feature.transactions.domain.services.suggestCategory
 import com.vm.coinfold.app.feature.transactions.domain.services.suggestNotes
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.Money
+import com.vm.coinfold.app.shared.domain.models.ResolvedLanguage
+import com.vm.coinfold.app.shared.platform.rememberVoiceInput
 import com.vm.coinfold.app.shared.ui.components.CalculatorKeypad
 import com.vm.coinfold.app.shared.ui.components.CategoryIcon
 import com.vm.coinfold.app.shared.ui.components.DatePickerDialogHost
@@ -67,6 +76,7 @@ import com.vm.coinfold.app.utils.OP_TIMES
 import com.vm.coinfold.app.utils.format
 import com.vm.coinfold.app.utils.parseRate
 import com.vm.coinfold.app.utils.today
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 
@@ -97,6 +107,9 @@ fun AddExpenseSheet(
     onDismiss: () -> Unit,
 ) {
     val language = LocalAppLanguage.current
+    val voice = rememberVoiceInput()
+    val scope = rememberCoroutineScope()
+    val voicePrompt = stringResource(Res.string.voice_prompt)
     var expression by remember { mutableStateOf("") }
     var currency by remember { mutableStateOf(initialCurrency) }
     var accountId by remember { mutableStateOf(accounts.firstOrNull()?.account?.id) }
@@ -189,6 +202,27 @@ fun AddExpenseSheet(
                     onValueChange = { note = it },
                     placeholder = { Text(stringResource(Res.string.expense_notes)) },
                     singleLine = true,
+                    // Say "150 UAH Silpo": amount, currency and note are filled in from the sentence.
+                    trailingIcon = if (voice.isAvailable) {
+                        {
+                            IconButton(onClick = {
+                                scope.launch {
+                                    val heard = voice.listen(voicePrompt, if (language == ResolvedLanguage.UK) "uk-UA" else "en-US")
+                                    if (heard != null) {
+                                        val spoken = parseSpokenExpense(heard)
+                                        spoken.amount?.let { expression = it.toPlainString() }
+                                        spoken.currency?.let {
+                                            currency = it
+                                            rateText = ""
+                                        }
+                                        if (spoken.note.isNotBlank()) note = spoken.note
+                                    }
+                                }
+                            }) { Icon(Icons.Outlined.Mic, contentDescription = null) }
+                        }
+                    } else {
+                        null
+                    },
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth(),
                 )

@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -53,7 +54,7 @@ class ExpensesViewModel(
     private val settingsRepository: SettingsRepository,
     currencyRepository: CurrencyRepository,
     accountRepository: AccountRepository,
-    transactionRepository: TransactionRepository,
+    private val transactionRepository: TransactionRepository,
     private val addExpense: AddExpenseUseCase,
 ) : ViewModel() {
 
@@ -109,9 +110,20 @@ class ExpensesViewModel(
             is ExpensesIntent.DeleteCategoryClicked -> dialog.value = ExpensesDialog.ConfirmDeleteCategory(intent.category)
             ExpensesIntent.ConfirmDeleteCategory -> confirmDelete()
             ExpensesIntent.UndoDeleteCategory -> viewModelScope.launch { categoryRepository.undoDelete() }
+            ExpensesIntent.QuickAddExpense -> quickAdd()
             is ExpensesIntent.ReorderCategories ->
                 viewModelScope.launch { categoryRepository.reorder(intent.ids) }
             is ExpensesIntent.SaveExpense -> saveExpense(intent)
+        }
+    }
+
+    /** Opens the entry sheet on the category of the latest expense (or the first one), if there is anything to fill in. */
+    private fun quickAdd() {
+        viewModelScope.launch {
+            val categories = categoryRepository.categories.first()
+            val last = transactionRepository.lastExpenseCategoryId()
+            val category = categories.firstOrNull { it.id == last } ?: categories.firstOrNull() ?: return@launch
+            dialog.value = ExpensesDialog.AddExpense(category)
         }
     }
 

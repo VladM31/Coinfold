@@ -4,6 +4,13 @@
     <!-- Exchange rates are loaded from the Monobank API -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- Lets the app see whether the device has a speech recognizer (voice input for expenses) -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.action.RECOGNIZE_SPEECH"/>
+        </intent>
+    </queries>
+
     <application
             android:name=".CoinfoldApplication"
             android:allowBackup="true"
@@ -12,15 +19,34 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <!-- singleTask: a shortcut or the widget brings the running app to the front instead of starting a copy -->
         <activity
                 android:exported="true"
+                android:launchMode="singleTask"
                 android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- Long-press the app icon: "Add expense" and "Add income" -->
+            <meta-data
+                    android:name="android.app.shortcuts"
+                    android:resource="@xml/shortcuts"/>
         </activity>
+
+        <!-- Home screen widget: what is left this period and a button to add an expense -->
+        <receiver
+                android:name=".QuickAddWidgetProvider"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/quick_add_widget_info"/>
+        </receiver>
 
         <!-- Lets other apps read the backup/export files we share from the cache -->
         <provider

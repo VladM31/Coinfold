@@ -38,6 +38,9 @@ sealed interface AccountsIntent {
     data object DismissDialog : AccountsIntent
     data object ConfirmDelete : AccountsIntent
     data object UndoDelete : AccountsIntent
+
+    /** From the icon shortcut: open the top-up sheet of the first account. */
+    data object QuickAddIncome : AccountsIntent
     data class MainCurrencySelected(val currency: Currency) : AccountsIntent
     data class SaveAccount(
         val id: Long?,

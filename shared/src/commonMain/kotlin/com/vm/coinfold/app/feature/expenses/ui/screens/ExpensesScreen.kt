@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -36,6 +37,8 @@ import com.vm.coinfold.app.feature.expenses.ui.components.AddExpenseSheet
 import com.vm.coinfold.app.feature.expenses.ui.components.CategoryFormSheet
 import com.vm.coinfold.app.feature.expenses.ui.components.CategoryGrid
 import com.vm.coinfold.app.feature.expenses.ui.components.SummaryRing
+import com.vm.coinfold.app.shared.launch.LaunchAction
+import com.vm.coinfold.app.shared.launch.LaunchActions
 import com.vm.coinfold.app.shared.ui.components.PeriodSwitcher
 import com.vm.coinfold.app.shared.ui.components.showUndo
 import org.jetbrains.compose.resources.getString
@@ -46,6 +49,15 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ExpensesScreen(viewModel: ExpensesViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
+
+    // A shortcut or the widget asked for this: handle it once the screen is there, then clear the request.
+    val launchAction by LaunchActions.pending.collectAsState()
+    LaunchedEffect(launchAction) {
+        if (launchAction == LaunchAction.ADD_EXPENSE) {
+            LaunchActions.consume(LaunchAction.ADD_EXPENSE)
+            viewModel.onIntent(ExpensesIntent.QuickAddExpense)
+        }
+    }
 
     LaunchedEffect(viewModel) {
         viewModel.effect.collect { effect ->

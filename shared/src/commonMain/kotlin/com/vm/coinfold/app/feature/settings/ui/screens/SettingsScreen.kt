@@ -18,10 +18,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coinfold.shared.generated.resources.Res
+import coinfold.shared.generated.resources.biometric_cancel
+import coinfold.shared.generated.resources.biometric_subtitle
+import coinfold.shared.generated.resources.biometric_title
 import coinfold.shared.generated.resources.language_en
 import coinfold.shared.generated.resources.language_system
 import coinfold.shared.generated.resources.language_uk
@@ -58,6 +62,7 @@ import com.vm.coinfold.app.feature.settings.ui.components.RatesStatus
 import com.vm.coinfold.app.feature.settings.ui.components.SettingsSection
 import com.vm.coinfold.app.shared.platform.rememberBiometricAuthenticator
 import com.vm.coinfold.app.shared.ui.components.CurrencySelector
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -82,6 +87,10 @@ fun SettingsScreen(
 
     val security by securityViewModel.state.collectAsStateWithLifecycle()
     val biometrics = rememberBiometricAuthenticator()
+    val scope = rememberCoroutineScope()
+    val promptTitle = stringResource(Res.string.biometric_title)
+    val promptSubtitle = stringResource(Res.string.biometric_subtitle)
+    val promptCancel = stringResource(Res.string.biometric_cancel)
 
     SettingsContent(
         state = state,
@@ -91,6 +100,17 @@ fun SettingsScreen(
         security = security,
         biometricAvailable = biometrics.isAvailable,
         onSecurityIntent = securityViewModel::onIntent,
+        onBiometricToggle = { enable ->
+            if (!enable) {
+                securityViewModel.onIntent(SecurityIntent.BiometricToggled(false))
+            } else {
+                scope.launch {
+                    if (biometrics.authenticate(promptTitle, promptSubtitle, promptCancel)) {
+                        securityViewModel.onIntent(SecurityIntent.BiometricToggled(true))
+                    }
+                }
+            }
+        },
         snackbar = snackbar,
     )
 }
@@ -104,6 +124,7 @@ private fun SettingsContent(
     security: SecurityState,
     biometricAvailable: Boolean,
     onSecurityIntent: (SecurityIntent) -> Unit,
+    onBiometricToggle: (Boolean) -> Unit,
     snackbar: SnackbarHostState,
 ) {
     val settings = state.settings
@@ -176,7 +197,7 @@ private fun SettingsContent(
             }
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-            SecuritySection(security, biometricAvailable, onSecurityIntent)
+            SecuritySection(security, biometricAvailable, onSecurityIntent, onBiometricToggle)
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // Backup, restore and export live on their own screen.
