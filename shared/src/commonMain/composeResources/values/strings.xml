@@ -177,6 +177,8 @@
     <string name="overview_vs_more_days">Spending is %1$s higher than in the same days of the previous period</string>
     <string name="overview_vs_less_days">Spending is %1$s lower than in the same days of the previous period</string>
     <string name="overview_trend_title">Last 12 periods</string>
+    <string name="overview_chart_daily">By day</string>
+    <string name="overview_chart_trend">By period</string>
     <string name="overview_trend_income">Income</string>
     <string name="overview_trend_expenses">Expenses</string>
 

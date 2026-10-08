@@ -26,6 +26,7 @@ import com.vm.coinfold.app.feature.transactions.domain.usecases.UpdateTransactio
 import com.vm.coinfold.app.shared.domain.models.Money
 import com.vm.coinfold.app.shared.domain.models.Period
 import com.vm.coinfold.app.shared.domain.models.TransactionType
+import com.vm.coinfold.app.shared.launch.TransactionFilterRequests
 import com.vm.coinfold.app.utils.epochMillisFor
 import com.vm.coinfold.app.utils.today
 import kotlin.time.ExperimentalTime
@@ -120,6 +121,19 @@ class TransactionsViewModel(
             dialog = dialog,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TransactionsState())
+
+    init {
+        // A filter posted by another screen (e.g. a category tapped on the overview).
+        viewModelScope.launch {
+            TransactionFilterRequests.pending.collect { requested ->
+                if (requested != null) {
+                    filter.value = requested
+                    limit.value = PAGE_SIZE
+                    TransactionFilterRequests.consume(requested)
+                }
+            }
+        }
+    }
 
     fun onIntent(intent: TransactionsIntent) {
         when (intent) {

@@ -1,5 +1,6 @@
 package com.vm.coinfold.app.feature.overview.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,27 +20,35 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.overview_by_category
 import coinfold.shared.generated.resources.overview_no_expenses
-import coinfold.shared.generated.resources.overview_trend_title
 import com.vm.coinfold.app.feature.overview.domain.viewmodels.OverviewIntent
 import com.vm.coinfold.app.feature.overview.domain.viewmodels.OverviewState
 import com.vm.coinfold.app.feature.overview.domain.viewmodels.OverviewViewModel
 import com.vm.coinfold.app.feature.overview.ui.components.AverageCards
 import com.vm.coinfold.app.feature.overview.ui.components.BalanceHeader
 import com.vm.coinfold.app.feature.overview.ui.components.CategoryShareRow
-import com.vm.coinfold.app.feature.overview.ui.components.DailyBarChart
-import com.vm.coinfold.app.feature.overview.ui.components.MonthlyTrendChart
+import com.vm.coinfold.app.feature.overview.ui.components.OverviewChart
+import com.vm.coinfold.app.feature.transactions.domain.models.PeriodFilter
+import com.vm.coinfold.app.feature.transactions.domain.models.TransactionFilter
+import com.vm.coinfold.app.shared.domain.models.TransactionType
 import com.vm.coinfold.app.shared.ui.components.PeriodSwitcher
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun OverviewScreen(viewModel: OverviewViewModel = koinViewModel()) {
+fun OverviewScreen(
+    onOpenTransactions: (TransactionFilter) -> Unit,
+    viewModel: OverviewViewModel = koinViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    OverviewContent(state, viewModel::onIntent)
+    OverviewContent(state, viewModel::onIntent, onOpenTransactions)
 }
 
 @Composable
-private fun OverviewContent(state: OverviewState, onIntent: (OverviewIntent) -> Unit) {
+private fun OverviewContent(
+    state: OverviewState,
+    onIntent: (OverviewIntent) -> Unit,
+    onOpenTransactions: (TransactionFilter) -> Unit,
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -56,12 +65,8 @@ private fun OverviewContent(state: OverviewState, onIntent: (OverviewIntent) -> 
         }
         val summary = state.summary ?: return@LazyColumn
         item { BalanceHeader(summary) }
-        item { DailyBarChart(summary.bars) }
+        item { OverviewChart(summary) }
         item { AverageCards(summary) }
-        item {
-            Text(stringResource(Res.string.overview_trend_title), style = MaterialTheme.typography.titleMedium)
-        }
-        item { MonthlyTrendChart(summary.trend) }
 
         if (summary.shares.isEmpty()) {
             item {
@@ -74,7 +79,25 @@ private fun OverviewContent(state: OverviewState, onIntent: (OverviewIntent) -> 
             }
         } else {
             item { Text(stringResource(Res.string.overview_by_category), style = MaterialTheme.typography.titleMedium) }
-            items(summary.shares, key = { it.category?.id ?: -1L }) { share -> CategoryShareRow(share) }
+            items(summary.shares, key = { it.category?.id ?: -1L }) { share ->
+                val categoryId = share.category?.id
+                val period = state.period
+                CategoryShareRow(
+                    share,
+                    // "Other" has no category to filter by, so it is not tappable.
+                    modifier = if (categoryId != null && period != null) {
+                        Modifier.clickable {
+                            onOpenTransactions(
+                                TransactionFilter(
+                                    period = PeriodFilter.Custom(period.start, period.endInclusive),
+                                    categoryId = categoryId,
+                                    type = TransactionType.EXPENSE,
+                                ),
+                            )
+                        }
+                    } else Modifier,
+                )
+            }
         }
     }
 }

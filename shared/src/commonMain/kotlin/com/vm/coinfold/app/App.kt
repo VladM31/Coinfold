@@ -50,6 +50,7 @@ import com.vm.coinfold.app.feature.transactions.ui.screens.TransactionsScreen
 import com.vm.coinfold.app.shared.domain.models.ResolvedLanguage
 import com.vm.coinfold.app.shared.launch.LaunchAction
 import com.vm.coinfold.app.shared.launch.LaunchActions
+import com.vm.coinfold.app.shared.launch.TransactionFilterRequests
 import com.vm.coinfold.app.shared.platform.HomeWidgets
 import com.vm.coinfold.app.shared.platform.SecureWindowEffect
 import com.vm.coinfold.app.shared.ui.components.LocalAppLanguage
@@ -187,7 +188,16 @@ private fun AppScaffold(navController: androidx.navigation.NavHostController) {
                     when (route) {
                         Route.Accounts -> AccountsScreen()
                         Route.Expenses -> ExpensesScreen()
-                        Route.Overview -> OverviewScreen()
+                        Route.Overview -> OverviewScreen(
+                            onOpenTransactions = { filter ->
+                                TransactionFilterRequests.post(filter)
+                                navController.navigate(Route.Transactions.path) {
+                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                        )
                         Route.Transactions -> TransactionsScreen()
                         Route.Settings -> SettingsScreen(
                             onOpenRecurring = { navController.navigate(RECURRING_ROUTE) },

@@ -177,6 +177,8 @@
     <string name="overview_vs_more_days">Витрати на %1$s більші, ніж за ті самі дні попереднього періоду</string>
     <string name="overview_vs_less_days">Витрати на %1$s менші, ніж за ті самі дні попереднього періоду</string>
     <string name="overview_trend_title">Останні 12 періодів</string>
+    <string name="overview_chart_daily">По днях</string>
+    <string name="overview_chart_trend">По періодах</string>
     <string name="overview_trend_income">Надходження</string>
     <string name="overview_trend_expenses">Витрати</string>
 
