@@ -83,6 +83,7 @@ class RecurringViewModel(
                     amount = amount,
                     note = intent.note,
                     frequency = intent.frequency,
+                    anchorDay = intent.anchorDay,
                     firstDate = intent.firstDate,
                     isActive = intent.isActive,
                 ),

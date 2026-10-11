@@ -6,7 +6,8 @@ import com.vm.coinfold.app.shared.domain.models.Money
 import com.vm.coinfold.app.shared.domain.models.TransactionType
 import kotlinx.datetime.LocalDate
 
-enum class Frequency { DAILY, WEEKLY, MONTHLY, YEARLY }
+/** [EVERY_N_DAYS] repeats after a number of days stored in [RecurringPayment.anchorDay]; [MONTHLY] on that day of every month. */
+enum class Frequency { DAILY, WEEKLY, EVERY_N_DAYS, MONTHLY, YEARLY }
 
 /**
  * A scheduled income or expense. [amount] is in the currency of the account. An expense without a
@@ -22,7 +23,10 @@ data class RecurringPayment(
     val amount: Money,
     val note: String,
     val frequency: Frequency,
-    /** Day of month a monthly/yearly payment is meant for, even if short months push it earlier. */
+    /**
+     * Day of month a monthly/yearly payment is meant for, even if short months push it earlier;
+     * for [Frequency.EVERY_N_DAYS] the number of days between payments.
+     */
     val anchorDay: Int,
     val nextDate: LocalDate,
     val isActive: Boolean,
@@ -38,6 +42,8 @@ data class RecurringDraft(
     val amount: Money,
     val note: String,
     val frequency: Frequency,
+    /** See [RecurringPayment.anchorDay]. */
+    val anchorDay: Int,
     val firstDate: LocalDate,
     val isActive: Boolean,
 )

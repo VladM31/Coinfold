@@ -169,6 +169,11 @@
     <string name="recurring_next">next %1$s</string>
     <string name="freq_daily">Every day</string>
     <string name="freq_weekly">Every week</string>
+    <string name="freq_every_n_days">Every N days</string>
+    <string name="freq_every_days">Every %1$d days</string>
+    <string name="freq_monthly_on">Every month on day %1$d</string>
+    <string name="recurring_interval_days">Every (days)</string>
+    <string name="recurring_month_day">Day of month</string>
     <string name="freq_monthly">Every month</string>
     <string name="freq_yearly">Every year</string>
 

@@ -40,6 +40,8 @@ import coinfold.shared.generated.resources.field_note
 import coinfold.shared.generated.resources.filter_category
 import coinfold.shared.generated.resources.recurring_edit_title
 import coinfold.shared.generated.resources.recurring_first_date
+import coinfold.shared.generated.resources.recurring_interval_days
+import coinfold.shared.generated.resources.recurring_month_day
 import coinfold.shared.generated.resources.recurring_new_title
 import coinfold.shared.generated.resources.recurring_repeat
 import coinfold.shared.generated.resources.type_expense
@@ -49,6 +51,7 @@ import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.feature.recurring.domain.models.Frequency
 import com.vm.coinfold.app.feature.recurring.domain.models.RecurringPayment
+import com.vm.coinfold.app.feature.recurring.domain.services.firstMonthlyDate
 import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.TransactionType
 import com.vm.coinfold.app.shared.ui.components.CategoryIcon
@@ -79,6 +82,7 @@ fun RecurringFormSheet(
         amount: BigDecimal,
         note: String,
         frequency: Frequency,
+        anchorDay: Int,
         firstDate: LocalDate,
     ) -> Unit,
     onDelete: (() -> Unit)?,
@@ -93,12 +97,26 @@ fun RecurringFormSheet(
     var customText by remember { mutableStateOf("") }
     var frequency by remember { mutableStateOf(payment?.frequency ?: Frequency.MONTHLY) }
     var firstDate by remember { mutableStateOf(payment?.nextDate ?: today()) }
+    // Days between payments for "every N days", and the day of the month for "every month".
+    var intervalText by remember {
+        mutableStateOf(payment?.takeIf { it.frequency == Frequency.EVERY_N_DAYS }?.anchorDay?.toString() ?: "28")
+    }
+    var monthDayText by remember {
+        mutableStateOf((payment?.takeIf { it.frequency == Frequency.MONTHLY }?.anchorDay ?: today().day).toString())
+    }
 
     val isIncome = type == TransactionType.INCOME
     val currencyCode = accounts.firstOrNull { it.account.id == accountId }?.account?.currency?.code
         ?: payment?.amount?.currency?.code.orEmpty()
     val amountValue = parseAmount(amount)
-    val canSave = amountValue != null && amountValue > BigDecimal.ZERO && accountId != null
+    val interval = intervalText.toIntOrNull()?.takeIf { it in 1..365 }
+    val monthDay = monthDayText.toIntOrNull()?.takeIf { it in 1..31 }
+    val scheduleValid = when (frequency) {
+        Frequency.EVERY_N_DAYS -> interval != null
+        Frequency.MONTHLY -> monthDay != null
+        else -> true
+    }
+    val canSave = amountValue != null && amountValue > BigDecimal.ZERO && accountId != null && scheduleValid
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -153,7 +171,19 @@ fun RecurringFormSheet(
                                 amountValue,
                                 note,
                                 frequency,
-                                firstDate,
+                                when (frequency) {
+                                    Frequency.EVERY_N_DAYS -> interval ?: return@Button
+                                    Frequency.MONTHLY -> monthDay ?: return@Button
+                                    else -> firstDate.day
+                                },
+                                // "Every month on day N" starts on the next such day; an unchanged day keeps its date.
+                                if (frequency == Frequency.MONTHLY && monthDay != null &&
+                                    !(payment?.frequency == Frequency.MONTHLY && payment.anchorDay == monthDay)
+                                ) {
+                                    firstMonthlyDate(today(), monthDay)
+                                } else {
+                                    firstDate
+                                },
                             )
                         }
                     },
@@ -224,8 +254,31 @@ fun RecurringFormSheet(
                     )
                 }
             }
-            Text(stringResource(Res.string.recurring_first_date), style = MaterialTheme.typography.labelLarge)
-            DateField(firstDate, onDateChange = { firstDate = it })
+            when (frequency) {
+                Frequency.EVERY_N_DAYS -> OutlinedTextField(
+                    value = intervalText,
+                    onValueChange = { intervalText = it.filter(Char::isDigit).take(3) },
+                    label = { Text(stringResource(Res.string.recurring_interval_days)) },
+                    singleLine = true,
+                    isError = interval == null,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Frequency.MONTHLY -> OutlinedTextField(
+                    value = monthDayText,
+                    onValueChange = { monthDayText = it.filter(Char::isDigit).take(2) },
+                    label = { Text(stringResource(Res.string.recurring_month_day)) },
+                    singleLine = true,
+                    isError = monthDay == null,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                else -> Unit
+            }
+            if (frequency != Frequency.MONTHLY) {
+                Text(stringResource(Res.string.recurring_first_date), style = MaterialTheme.typography.labelLarge)
+                DateField(firstDate, onDateChange = { firstDate = it })
+            }
             Spacer(Modifier.height(16.dp))
         }
     }

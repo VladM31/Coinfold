@@ -8,6 +8,7 @@ import com.vm.coinfold.app.feature.recurring.domain.models.Frequency
 import com.vm.coinfold.app.feature.recurring.domain.models.RecurringDraft
 import com.vm.coinfold.app.feature.recurring.domain.models.RecurringPayment
 import com.vm.coinfold.app.feature.recurring.domain.repositories.RecurringRepository
+import com.vm.coinfold.app.feature.recurring.domain.services.firstMonthlyDate
 import com.vm.coinfold.app.feature.recurring.domain.services.nextOccurrence
 import com.vm.coinfold.app.feature.recurring.domain.usecases.ProcessRecurringPaymentsUseCase
 import com.vm.coinfold.app.feature.transactions.domain.models.NoteSuggestion
@@ -60,6 +61,20 @@ class RecurringLogicTest {
         assertEquals(LocalDate(2027, 1, 15), nextOccurrence(LocalDate(2026, 12, 15), Frequency.MONTHLY, 15))
         assertEquals(LocalDate(2025, 2, 28), nextOccurrence(LocalDate(2024, 2, 29), Frequency.YEARLY, 29))
         assertEquals(LocalDate(2028, 2, 29), nextOccurrence(LocalDate(2027, 2, 28), Frequency.YEARLY, 29))
+    }
+
+    @Test
+    fun everyNDaysUsesTheIntervalStoredInTheAnchor() {
+        assertEquals(LocalDate(2026, 4, 7), nextOccurrence(LocalDate(2026, 3, 10), Frequency.EVERY_N_DAYS, 28))
+        assertEquals(LocalDate(2026, 3, 11), nextOccurrence(LocalDate(2026, 3, 10), Frequency.EVERY_N_DAYS, 0))
+    }
+
+    @Test
+    fun monthlyStartsOnTheNextChosenDay() {
+        assertEquals(LocalDate(2026, 3, 20), firstMonthlyDate(LocalDate(2026, 3, 10), 20))
+        assertEquals(LocalDate(2026, 3, 10), firstMonthlyDate(LocalDate(2026, 3, 10), 10))
+        assertEquals(LocalDate(2026, 4, 5), firstMonthlyDate(LocalDate(2026, 3, 10), 5))
+        assertEquals(LocalDate(2026, 2, 28), firstMonthlyDate(LocalDate(2026, 2, 1), 31))
     }
 
     // ---------- processing ----------

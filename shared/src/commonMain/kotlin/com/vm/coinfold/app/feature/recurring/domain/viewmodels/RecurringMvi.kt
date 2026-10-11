@@ -40,6 +40,7 @@ sealed interface RecurringIntent {
         val amount: BigDecimal,
         val note: String,
         val frequency: Frequency,
+        val anchorDay: Int,
         val firstDate: LocalDate,
         val isActive: Boolean,
     ) : RecurringIntent

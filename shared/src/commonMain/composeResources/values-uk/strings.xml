@@ -169,6 +169,11 @@
     <string name="recurring_next">наступний %1$s</string>
     <string name="freq_daily">Щодня</string>
     <string name="freq_weekly">Щотижня</string>
+    <string name="freq_every_n_days">Кожні N днів</string>
+    <string name="freq_every_days">Кожні %1$d днів</string>
+    <string name="freq_monthly_on">Щомісяця, %1$d числа</string>
+    <string name="recurring_interval_days">Кожні (днів)</string>
+    <string name="recurring_month_day">Число місяця</string>
     <string name="freq_monthly">Щомісяця</string>
     <string name="freq_yearly">Щороку</string>
 

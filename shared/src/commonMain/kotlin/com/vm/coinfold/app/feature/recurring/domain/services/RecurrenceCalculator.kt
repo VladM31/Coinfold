@@ -13,6 +13,7 @@ import kotlinx.datetime.plus
  * (for example the 31st) and use the last day of shorter months, without drifting to the 28th forever.
  */
 fun nextOccurrence(date: LocalDate, frequency: Frequency, anchorDay: Int): LocalDate = when (frequency) {
+    Frequency.EVERY_N_DAYS -> date.plus(anchorDay.coerceAtLeast(1), DateTimeUnit.DAY)
     Frequency.DAILY -> date.plus(1, DateTimeUnit.DAY)
     Frequency.WEEKLY -> date.plus(7, DateTimeUnit.DAY)
     Frequency.MONTHLY -> {
@@ -23,6 +24,14 @@ fun nextOccurrence(date: LocalDate, frequency: Frequency, anchorDay: Int): Local
         val year = date.year + 1
         LocalDate(year, date.month, minOf(anchorDay, lengthOfMonth(year, date.month.number)))
     }
+}
+
+/** The first date on or after [from] that falls on [day] of a month (the last day of months that are shorter). */
+fun firstMonthlyDate(from: LocalDate, day: Int): LocalDate {
+    val thisMonth = LocalDate(from.year, from.month, minOf(day, lengthOfMonth(from.year, from.month.number)))
+    if (thisMonth >= from) return thisMonth
+    val next = from.plus(1, DateTimeUnit.MONTH)
+    return LocalDate(next.year, next.month, minOf(day, lengthOfMonth(next.year, next.month.number)))
 }
 
 private fun lengthOfMonth(year: Int, month: Int): Int {

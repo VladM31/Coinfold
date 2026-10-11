@@ -125,7 +125,7 @@ private fun RecurringDialogs(state: RecurringState, onIntent: (RecurringIntent) 
         accounts = state.accounts,
         categories = state.categories,
         customSources = state.customSources,
-        onSave = { type, accountId, categoryId, source, amount, note, frequency, firstDate ->
+        onSave = { type, accountId, categoryId, source, amount, note, frequency, anchorDay, firstDate ->
             onIntent(
                 RecurringIntent.Save(
                     id = payment?.id,
@@ -136,6 +136,7 @@ private fun RecurringDialogs(state: RecurringState, onIntent: (RecurringIntent) 
                     amount = amount,
                     note = note,
                     frequency = frequency,
+                    anchorDay = anchorDay,
                     firstDate = firstDate,
                     isActive = payment?.isActive ?: true,
                 ),

@@ -29,7 +29,7 @@ class RecurringRepositoryImpl(private val dao: RecurringDao) : RecurringReposito
             amountMinor = draft.amount.minorUnits,
             note = draft.note.trim(),
             frequency = draft.frequency.name,
-            anchorDay = draft.firstDate.day,
+            anchorDay = draft.anchorDay,
             nextDate = draft.firstDate.toString(),
             isActive = draft.isActive,
         )

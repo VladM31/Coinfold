@@ -24,6 +24,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.freq_daily
+import coinfold.shared.generated.resources.freq_every_days
+import coinfold.shared.generated.resources.freq_every_n_days
+import coinfold.shared.generated.resources.freq_monthly_on
 import coinfold.shared.generated.resources.freq_monthly
 import coinfold.shared.generated.resources.freq_weekly
 import coinfold.shared.generated.resources.freq_yearly
@@ -40,10 +43,19 @@ import com.vm.coinfold.app.utils.format
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
+/** Full description of the schedule, for example "Every 28 days" or "Every month on day 15". */
+@Composable
+private fun RecurringPayment.scheduleText(): String = when (frequency) {
+    Frequency.EVERY_N_DAYS -> stringResource(Res.string.freq_every_days, anchorDay)
+    Frequency.MONTHLY -> stringResource(Res.string.freq_monthly_on, anchorDay)
+    else -> stringResource(frequency.label())
+}
+
 /** Label of a frequency, for example "Every month". */
 fun Frequency.label(): StringResource = when (this) {
     Frequency.DAILY -> Res.string.freq_daily
     Frequency.WEEKLY -> Res.string.freq_weekly
+    Frequency.EVERY_N_DAYS -> Res.string.freq_every_n_days
     Frequency.MONTHLY -> Res.string.freq_monthly
     Frequency.YEARLY -> Res.string.freq_yearly
 }
@@ -90,7 +102,7 @@ fun RecurringListItem(
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(
-                stringResource(payment.frequency.label()) + " · " +
+                payment.scheduleText() + " · " +
                     stringResource(Res.string.recurring_next, payment.nextDate.format()) + " · " + payment.accountName,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
