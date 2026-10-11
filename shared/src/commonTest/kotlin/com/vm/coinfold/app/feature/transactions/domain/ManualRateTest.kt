@@ -33,6 +33,7 @@ class ManualRateTest {
         override val noteSuggestions: Flow<List<NoteSuggestion>> = flowOf(emptyList())
         override suspend fun addManual(
             type: TransactionType, accountId: Long, amount: Money, source: IncomeSource?, note: String, dateTime: Long,
+            isTransfer: Boolean,
         ) = Unit
         override suspend fun addExpense(
             accountId: Long, categoryId: Long, amount: Money, accountAmount: Money, rate: BigDecimal,

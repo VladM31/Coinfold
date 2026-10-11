@@ -27,6 +27,7 @@ interface TransactionRepository {
         source: IncomeSource?,
         note: String,
         dateTime: Long,
+        isTransfer: Boolean = false,
     )
 
     /** Adds a categorized expense; [accountAmount] is [amount] converted at [rate] into the account currency. */

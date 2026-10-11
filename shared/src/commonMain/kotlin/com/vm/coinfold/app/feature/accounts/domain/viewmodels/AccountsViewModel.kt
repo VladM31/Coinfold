@@ -150,6 +150,7 @@ class AccountsViewModel(
                 source = null,
                 note = intent.note.ifBlank { "→ ${target.name}" },
                 dateTime = dateTime,
+                isTransfer = true,
             )
             addManualTransaction(
                 type = TransactionType.INCOME,
@@ -158,6 +159,7 @@ class AccountsViewModel(
                 source = IncomeSource.Preset.OTHER,
                 note = intent.note.ifBlank { "← ${from.name}" },
                 dateTime = dateTime,
+                isTransfer = true,
             )
             dialog.value = null
         }

@@ -75,6 +75,7 @@ class ExportTransactionsUseCase(
         var income = Money.zero(main)
         var expenses = Money.zero(main)
         for (item in items) {
+            if (item.isTransfer) continue
             // Totals use today's rates; amounts without any known rate are left out of the totals.
             val converted = rates.convert(item.amount, main)?.money ?: continue
             if (item.type == TransactionType.INCOME) income += converted else expenses += converted

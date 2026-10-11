@@ -30,9 +30,9 @@ import com.vm.coinfold.app.shared.db.converters.Converters
         RateEntity::class,
         RecurringEntity::class,
     ],
-    version = 2,
-    // v1 -> v2 only adds the "recurring" table, so Room can migrate existing data automatically.
-    autoMigrations = [AutoMigration(from = 1, to = 2)],
+    version = 3,
+    // v1 -> v2 adds the "recurring" table, v2 -> v3 the "isTransfer" column; Room migrates the data automatically.
+    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)],
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)

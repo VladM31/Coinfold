@@ -10,11 +10,11 @@ interface OverviewDao {
     /** [from] inclusive, [to] exclusive, both UTC epoch millis. */
     @Query(
         "SELECT type, categoryId, currency, amountMinor, dateTime FROM transactions " +
-            "WHERE dateTime >= :from AND dateTime < :to ORDER BY dateTime",
+            "WHERE isTransfer = 0 AND dateTime >= :from AND dateTime < :to ORDER BY dateTime",
     )
     fun observeRows(from: Long, to: Long): Flow<List<OverviewRow>>
 
     /** Everything ever recorded, for averages and the trend over several periods. */
-    @Query("SELECT type, categoryId, currency, amountMinor, dateTime FROM transactions")
+    @Query("SELECT type, categoryId, currency, amountMinor, dateTime FROM transactions WHERE isTransfer = 0")
     fun observeAll(): Flow<List<OverviewRow>>
 }

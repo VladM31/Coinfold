@@ -14,5 +14,6 @@ class AddManualTransactionUseCase(private val repository: TransactionRepository)
         source: IncomeSource?,
         note: String,
         dateTime: Long,
-    ) = repository.addManual(type, accountId, amount, source, note, dateTime)
+        isTransfer: Boolean = false,
+    ) = repository.addManual(type, accountId, amount, source, note, dateTime, isTransfer)
 }

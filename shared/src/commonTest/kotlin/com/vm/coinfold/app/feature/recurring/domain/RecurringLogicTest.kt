@@ -70,7 +70,6 @@ class RecurringLogicTest {
         override suspend fun setActive(id: Long, active: Boolean) = Unit
         override suspend fun delete(id: Long) = Unit
         override suspend fun undoDelete() = Unit
-        override suspend fun lastExpenseCategoryId(): Long? = null
         override suspend fun due(today: LocalDate) = items.filter { it.isActive && it.nextDate <= today }
         override suspend fun setNextDate(id: Long, nextDate: LocalDate) {
             val i = items.indexOfFirst { it.id == id }
@@ -85,6 +84,7 @@ class RecurringLogicTest {
         override val noteSuggestions: Flow<List<NoteSuggestion>> = flowOf(emptyList())
         override suspend fun addManual(
             type: TransactionType, accountId: Long, amount: Money, source: IncomeSource?, note: String, dateTime: Long,
+            isTransfer: Boolean,
         ) { created += Created(type, null, amount, dateTime) }
         override suspend fun addExpense(
             accountId: Long, categoryId: Long, amount: Money, accountAmount: Money, rate: BigDecimal,
@@ -97,6 +97,7 @@ class RecurringLogicTest {
         ) = Unit
         override suspend fun delete(id: Long) = Unit
         override suspend fun undoDelete() = Unit
+        override suspend fun lastExpenseCategoryId(): Long? = null
         override suspend fun duplicate(id: Long, dateTime: Long) = true
     }
 

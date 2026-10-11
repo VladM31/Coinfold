@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface ExpenseStatsDao {
     @Query(
         "SELECT type, categoryId, currency, SUM(amountMinor) AS total FROM transactions " +
-            "WHERE dateTime >= :from AND dateTime < :to GROUP BY type, categoryId, currency",
+            "WHERE isTransfer = 0 AND dateTime >= :from AND dateTime < :to GROUP BY type, categoryId, currency",
     )
     fun observeTotals(from: Long, to: Long): Flow<List<TotalRow>>
 }

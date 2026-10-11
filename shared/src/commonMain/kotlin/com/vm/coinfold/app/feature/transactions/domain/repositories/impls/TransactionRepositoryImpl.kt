@@ -30,6 +30,7 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         source: IncomeSource?,
         note: String,
         dateTime: Long,
+        isTransfer: Boolean,
     ) {
         require(amount.minorUnits > 0) { "Amount must be positive" }
         dao.insert(
@@ -43,6 +44,7 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
                 rate = BigDecimal.ONE.toPlainString(),
                 note = note.trim(),
                 dateTime = dateTime,
+                isTransfer = isTransfer,
             ),
         )
     }
@@ -95,6 +97,7 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
         dateTime: Long,
     ) {
         require(amount.minorUnits > 0 && accountAmount.minorUnits > 0) { "Amount must be positive" }
+        val wasTransfer = dao.getById(id)?.isTransfer ?: false
         dao.update(
             TransactionEntity(
                 id = id,
@@ -108,6 +111,7 @@ class TransactionRepositoryImpl(private val dao: TransactionDao) : TransactionRe
                 rate = rate.toPlainString(),
                 note = note.trim(),
                 dateTime = dateTime,
+                isTransfer = wasTransfer,
             ),
         )
     }
@@ -155,5 +159,6 @@ private fun TransactionRow.toItem(): TransactionItem {
         accountAmount = Money(t.accountAmountMinor, accountCurrency),
         rate = BigDecimal.parseString(t.rate),
         dateTime = t.dateTime,
+        isTransfer = t.isTransfer,
     )
 }

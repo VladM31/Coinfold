@@ -1,5 +1,6 @@
 package com.vm.coinfold.app.feature.transactions.db.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -35,4 +36,6 @@ data class TransactionEntity(
     val note: String = "",
     /** UTC epoch millis. */
     val dateTime: Long,
+    /** One half of a move between two own accounts: counts for balances but not for income/expense statistics. */
+    @ColumnInfo(defaultValue = "0") val isTransfer: Boolean = false,
 )

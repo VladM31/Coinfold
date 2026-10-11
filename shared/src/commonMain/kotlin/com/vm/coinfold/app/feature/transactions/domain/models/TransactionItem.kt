@@ -28,6 +28,8 @@ data class TransactionItem(
     val rate: BigDecimal,
     /** UTC epoch millis. */
     val dateTime: Long,
+    /** Half of a transfer between own accounts; left out of totals. */
+    val isTransfer: Boolean = false,
 ) {
     /** Signed amount in the operation currency: positive for income, negative for expenses. */
     val signedAmount: Money

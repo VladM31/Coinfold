@@ -68,6 +68,7 @@ data class BackupTransaction(
     val rate: String,
     val note: String = "",
     val dateTime: Long,
+    val isTransfer: Boolean = false,
 )
 
 @Serializable

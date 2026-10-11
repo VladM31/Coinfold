@@ -47,7 +47,7 @@ class BackupRepositoryImpl(
             transactions = data.transactions.map {
                 BackupTransaction(
                     it.id, it.type.name, it.accountId, it.categoryId, it.incomeSource, it.amountMinor, it.currency.code,
-                    it.accountAmountMinor, it.rate, it.note, it.dateTime,
+                    it.accountAmountMinor, it.rate, it.note, it.dateTime, it.isTransfer,
                 )
             },
             recurring = data.recurring.map {
@@ -83,6 +83,7 @@ class BackupRepositoryImpl(
                         rate = it.rate,
                         note = it.note,
                         dateTime = it.dateTime,
+                        isTransfer = it.isTransfer,
                     )
                 },
                 recurring = file.recurring.map {
