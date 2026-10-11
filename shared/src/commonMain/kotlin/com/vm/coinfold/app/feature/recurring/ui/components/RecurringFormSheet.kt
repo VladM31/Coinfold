@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import com.vm.coinfold.app.shared.ui.components.rememberFullSheetState
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -99,7 +100,11 @@ fun RecurringFormSheet(
     val amountValue = parseAmount(amount)
     val canSave = amountValue != null && amountValue > BigDecimal.ZERO && accountId != null
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        // Fully expanded, so the keyboard pushes the content up instead of covering half-height sheet.
+        sheetState = rememberFullSheetState(),
+    ) {
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())

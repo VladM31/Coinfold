@@ -26,7 +26,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import com.vm.coinfold.app.shared.ui.components.rememberFullSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -136,7 +136,7 @@ fun AccountOperationSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        sheetState = rememberFullSheetState(),
         dragHandle = null,
     ) {
         Column(Modifier.navigationBarsPadding().imePadding().verticalScroll(rememberScrollState())) {
