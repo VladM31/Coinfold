@@ -3,6 +3,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeCompiler)
+    // Reads google-services.json and uploads the mapping files that make crash traces readable.
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.firebaseCrashlytics)
 }
 
 kotlin {
@@ -16,6 +19,10 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     // BiometricPrompt needs a FragmentActivity, which comes with this library
     implementation(libs.androidx.biometric)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)

@@ -19,3 +19,7 @@ captures
 node_modules/
 /temp/
 /docs/
+
+# Firebase config of the maintainer's project; each developer uses their own
+androidApp/google-services.json
+iosApp/iosApp/GoogleService-Info.plist
