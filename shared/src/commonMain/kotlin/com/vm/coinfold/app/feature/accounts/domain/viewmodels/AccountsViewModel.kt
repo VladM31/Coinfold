@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.accounts_archived
 import coinfold.shared.generated.resources.accounts_deleted
+import coinfold.shared.generated.resources.expense_no_rate
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountDraft
 import com.vm.coinfold.app.feature.accounts.domain.models.DeleteResult
 import com.vm.coinfold.app.feature.accounts.domain.repositories.AccountRepository
@@ -13,7 +14,9 @@ import com.vm.coinfold.app.feature.currency.domain.repositories.CurrencyReposito
 import com.vm.coinfold.app.feature.settings.domain.repositories.SettingsRepository
 import com.vm.coinfold.app.feature.transactions.domain.repositories.TransactionRepository
 import com.vm.coinfold.app.feature.transactions.domain.usecases.AddManualTransactionUseCase
+import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.Money
+import com.vm.coinfold.app.shared.domain.models.TransactionType
 import com.vm.coinfold.app.utils.epochMillisFor
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +31,7 @@ import kotlinx.coroutines.launch
 class AccountsViewModel(
     private val accountRepository: AccountRepository,
     private val settingsRepository: SettingsRepository,
-    currencyRepository: CurrencyRepository,
+    private val currencyRepository: CurrencyRepository,
     transactionRepository: TransactionRepository,
     private val addManualTransaction: AddManualTransactionUseCase,
 ) : ViewModel() {
@@ -50,6 +53,7 @@ class AccountsViewModel(
             total = calculateTotalBalance(accounts, settings.mainCurrency, rates),
             mainCurrency = settings.mainCurrency,
             customSources = sources,
+            rates = rates,
             dialog = dialog,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AccountsState())
@@ -70,6 +74,7 @@ class AccountsViewModel(
                 accountRepository.accounts.first().firstOrNull()?.let { dialog.value = AccountsDialog.Operation(it) }
             }
             is AccountsIntent.SaveOperation -> saveOperation(intent)
+            is AccountsIntent.SaveTransfer -> saveTransfer(intent)
         }
     }
 
@@ -117,6 +122,42 @@ class AccountsViewModel(
                 source = intent.source,
                 note = intent.note,
                 dateTime = epochMillisFor(intent.date),
+            )
+            dialog.value = null
+        }
+    }
+
+    /** A transfer is a withdrawal from this account plus a top-up of the other one, converted at the current rate. */
+    private fun saveTransfer(intent: AccountsIntent.SaveTransfer) {
+        val operation = dialog.value as? AccountsDialog.Operation ?: return
+        val from = operation.item.account
+        val amount = Money.of(intent.amount, from.currency)
+        if (amount.minorUnits <= 0) return
+        viewModelScope.launch {
+            val target = accountRepository.accounts.first().firstOrNull { it.account.id == intent.toAccountId }?.account
+                ?: return@launch
+            if (target.id == from.id) return@launch
+            val received = currencyRepository.rateTable.first().convert(amount, target.currency)?.money
+            if (received == null || received.minorUnits <= 0) {
+                effects.send(AccountsEffect.ShowMessage(Res.string.expense_no_rate))
+                return@launch
+            }
+            val dateTime = epochMillisFor(intent.date)
+            addManualTransaction(
+                type = TransactionType.EXPENSE,
+                accountId = from.id,
+                amount = amount,
+                source = null,
+                note = intent.note.ifBlank { "→ ${target.name}" },
+                dateTime = dateTime,
+            )
+            addManualTransaction(
+                type = TransactionType.INCOME,
+                accountId = target.id,
+                amount = received,
+                source = IncomeSource.Preset.OTHER,
+                note = intent.note.ifBlank { "← ${from.name}" },
+                dateTime = dateTime,
             )
             dialog.value = null
         }

@@ -100,3 +100,9 @@ object Calculator {
         }
     }
 }
+
+/** Plain text of a calculation result to continue typing from: no exponent, no trailing zeros. */
+fun BigDecimal.toExpression(): String {
+    val plain = toPlainString()
+    return if ('.' in plain) plain.trimEnd('0').trimEnd('.') else plain
+}

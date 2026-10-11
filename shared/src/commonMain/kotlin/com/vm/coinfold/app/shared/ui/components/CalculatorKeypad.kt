@@ -41,6 +41,8 @@ fun CalculatorKeypad(
     currency: Currency,
     accent: Color,
     confirmEnabled: Boolean,
+    /** True while the expression has an operator: the big key then shows "=" and [onConfirm] evaluates it. */
+    showEquals: Boolean,
     onKey: (Char) -> Unit,
     onBackspace: () -> Unit,
     /** Null makes the currency key a plain label (used when the currency is fixed, e.g. an account). */
@@ -85,7 +87,11 @@ fun CalculatorKeypad(
                 modifier = Modifier.fillMaxWidth().height(KEY_HEIGHT * 2 + KEY_GAP),
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Outlined.Check, contentDescription = null, tint = Color.White)
+                    if (showEquals) {
+                        Text("=", style = MaterialTheme.typography.headlineMedium, color = Color.White)
+                    } else {
+                        Icon(Icons.Outlined.Check, contentDescription = null, tint = Color.White)
+                    }
                 }
             }
         }

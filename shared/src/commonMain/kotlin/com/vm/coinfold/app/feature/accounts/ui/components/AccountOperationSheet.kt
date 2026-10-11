@@ -3,6 +3,9 @@ package com.vm.coinfold.app.feature.accounts.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -17,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -39,6 +43,8 @@ import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.accounts_balance_after
 import coinfold.shared.generated.resources.accounts_operation_label
 import coinfold.shared.generated.resources.accounts_top_up
+import coinfold.shared.generated.resources.accounts_transfer
+import coinfold.shared.generated.resources.accounts_transfer_to
 import coinfold.shared.generated.resources.accounts_withdraw
 import coinfold.shared.generated.resources.date_today
 import coinfold.shared.generated.resources.expense_account
@@ -46,6 +52,7 @@ import coinfold.shared.generated.resources.expense_notes
 import coinfold.shared.generated.resources.field_amount
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
+import com.vm.coinfold.app.feature.currency.domain.models.RateTable
 import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.Money
 import com.vm.coinfold.app.shared.domain.models.TransactionType
@@ -64,6 +71,7 @@ import com.vm.coinfold.app.utils.OP_MINUS
 import com.vm.coinfold.app.utils.OP_PLUS
 import com.vm.coinfold.app.utils.OP_TIMES
 import com.vm.coinfold.app.utils.format
+import com.vm.coinfold.app.utils.toExpression
 import com.vm.coinfold.app.utils.today
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
@@ -74,17 +82,21 @@ private const val OPERATORS = "$OP_PLUS$OP_MINUS$OP_TIMES$OP_DIVIDE"
  * Calculator sheet opened by tapping an account: the same keypad as the expense sheet, plus a switch between
  * topping up (with a source) and withdrawing. The amount is always in the currency of the account.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AccountOperationSheet(
     item: AccountWithBalance,
     customSources: List<String>,
+    otherAccounts: List<AccountWithBalance>,
+    rates: RateTable,
     onSave: (type: TransactionType, amount: BigDecimal, source: IncomeSource?, note: String, date: LocalDate) -> Unit,
+    onTransfer: (toAccountId: Long, amount: BigDecimal, note: String, date: LocalDate) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val language = LocalAppLanguage.current
     val account = item.account
-    var type by remember { mutableStateOf(TransactionType.INCOME) }
+    var mode by remember { mutableStateOf(OperationMode.TOP_UP) }
+    var targetId by remember { mutableStateOf(otherAccounts.firstOrNull()?.account?.id) }
     var expression by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
     var date by remember { mutableStateOf(today()) }
@@ -92,8 +104,13 @@ fun AccountOperationSheet(
     var selectedSource by remember { mutableStateOf<IncomeSource>(IncomeSource.Preset.SALARY) }
     var customText by remember { mutableStateOf("") }
 
-    val isIncome = type == TransactionType.INCOME
-    val accent = if (isIncome) IncomeGreen else MaterialTheme.colorScheme.error
+    val isIncome = mode == OperationMode.TOP_UP
+    val isTransfer = mode == OperationMode.TRANSFER
+    val accent = when (mode) {
+        OperationMode.TOP_UP -> IncomeGreen
+        OperationMode.WITHDRAW -> MaterialTheme.colorScheme.error
+        OperationMode.TRANSFER -> MaterialTheme.colorScheme.primary
+    }
     val accountColor = Color(account.color ?: DEFAULT_ACCOUNT_COLOR)
 
     val result = Calculator.evaluate(expression)
@@ -104,13 +121,25 @@ fun AccountOperationSheet(
         else -> item.balance - entered
     }
     val hasOperator = expression.drop(1).any { it in OPERATORS }
+    val target = otherAccounts.firstOrNull { it.account.id == targetId }
+    // What the other account receives; null while the rate between the two currencies is unknown.
+    val received = if (isTransfer && entered != null && target != null) {
+        rates.convert(entered, target.account.currency)?.money
+    } else {
+        null
+    }
+    val canSave = when {
+        entered == null -> false
+        isTransfer -> received != null && received.minorUnits > 0
+        else -> true
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         dragHandle = null,
     ) {
-        Column(Modifier.navigationBarsPadding().verticalScroll(rememberScrollState())) {
+        Column(Modifier.navigationBarsPadding().imePadding().verticalScroll(rememberScrollState())) {
             // Left: the account. Right: the operation; tap it to switch between top-up and withdrawal.
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                 Box(Modifier.weight(1f).background(accountColor)) {
@@ -123,14 +152,24 @@ fun AccountOperationSheet(
                         .weight(1f)
                         .background(accent)
                         .clickable {
-                            type = if (isIncome) TransactionType.EXPENSE else TransactionType.INCOME
+                            mode = when (mode) {
+                                OperationMode.TOP_UP -> OperationMode.WITHDRAW
+                                OperationMode.WITHDRAW -> if (otherAccounts.isEmpty()) OperationMode.TOP_UP else OperationMode.TRANSFER
+                                OperationMode.TRANSFER -> OperationMode.TOP_UP
+                            }
                         },
                 ) {
                     SheetHeaderHalf(
                         label = stringResource(Res.string.accounts_operation_label),
-                        title = stringResource(if (isIncome) Res.string.accounts_top_up else Res.string.accounts_withdraw),
+                        title = stringResource(
+                            when (mode) {
+                                OperationMode.TOP_UP -> Res.string.accounts_top_up
+                                OperationMode.WITHDRAW -> Res.string.accounts_withdraw
+                                OperationMode.TRANSFER -> Res.string.accounts_transfer
+                            },
+                        ),
                     ) {
-                        Text(if (isIncome) "+" else "−", style = MaterialTheme.typography.titleLarge, color = accent)
+                        Text(when (mode) { OperationMode.TOP_UP -> "+"; OperationMode.WITHDRAW -> "−"; OperationMode.TRANSFER -> "⇄" }, style = MaterialTheme.typography.titleLarge, color = accent)
                     }
                 }
             }
@@ -171,6 +210,26 @@ fun AccountOperationSheet(
                     )
                 }
 
+                if (isTransfer) {
+                    Text(stringResource(Res.string.accounts_transfer_to), style = MaterialTheme.typography.labelLarge)
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        otherAccounts.forEach { option ->
+                            FilterChip(
+                                selected = option.account.id == targetId,
+                                onClick = { targetId = option.account.id },
+                                label = { Text("${option.account.name} · ${option.account.currency.code}") },
+                            )
+                        }
+                    }
+                    if (received != null && target != null && target.account.currency != account.currency) {
+                        Text(
+                            "→ ${received.format(language)}",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
                 OutlinedTextField(
                     value = note,
                     onValueChange = { note = it },
@@ -183,16 +242,23 @@ fun AccountOperationSheet(
                 CalculatorKeypad(
                     currency = account.currency,
                     accent = accent,
-                    confirmEnabled = entered != null,
+                    confirmEnabled = if (hasOperator) result != null else canSave,
+                    showEquals = hasOperator,
                     onKey = { expression = CalculatorInput.append(expression, it) },
                     onBackspace = { expression = CalculatorInput.backspace(expression) },
                     // The currency of an account is fixed, so the key is just a label here.
                     onCurrencyClick = null,
                     onDateClick = { datePickerOpen = true },
                     onConfirm = {
-                        if (result != null) {
-                            val source = if (isIncome) resolveSource(selectedSource, customText) else null
-                            onSave(type, result, source, note, date)
+                        if (hasOperator) {
+                            result?.let { expression = it.toExpression() }
+                        } else if (result != null && canSave) {
+                            if (isTransfer) {
+                                targetId?.let { onTransfer(it, result, note, date) }
+                            } else {
+                                val source = if (isIncome) resolveSource(selectedSource, customText) else null
+                                onSave(if (isIncome) TransactionType.INCOME else TransactionType.EXPENSE, result, source, note, date)
+                            }
                         }
                     },
                 )
@@ -217,6 +283,8 @@ fun AccountOperationSheet(
         DatePickerDialogHost(date, onDateChange = { date = it }, onDismiss = { datePickerOpen = false })
     }
 }
+
+private enum class OperationMode { TOP_UP, WITHDRAW, TRANSFER }
 
 @Composable
 private fun AmountCard(

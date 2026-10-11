@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -75,6 +76,7 @@ import com.vm.coinfold.app.utils.OP_PLUS
 import com.vm.coinfold.app.utils.OP_TIMES
 import com.vm.coinfold.app.utils.format
 import com.vm.coinfold.app.utils.parseRate
+import com.vm.coinfold.app.utils.toExpression
 import com.vm.coinfold.app.utils.today
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -140,18 +142,18 @@ fun AddExpenseSheet(
     }
     val rateValid = !crossCurrency || rateText.isBlank() || rateOverride != null
     val canSave = entered != null && fromAccount != null && account != null && rateValid
+    val hasOperator = expression.drop(1).any { it in OPERATORS }
 
     val noteHints = suggestNotes(noteSuggestions, note, selectedCategory.id)
     val suggestedCategory = suggestCategory(noteSuggestions, note)
         ?.let { id -> categories.firstOrNull { it.id == id && it.id != selectedCategory.id } }
-    val hasOperator = expression.drop(1).any { it in OPERATORS }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         dragHandle = null,
     ) {
-        Column(Modifier.navigationBarsPadding().verticalScroll(rememberScrollState())) {
+        Column(Modifier.navigationBarsPadding().imePadding().verticalScroll(rememberScrollState())) {
             if (accounts.isEmpty()) {
                 Text(
                     stringResource(Res.string.expense_no_accounts),
@@ -248,7 +250,8 @@ fun AddExpenseSheet(
                 CalculatorKeypad(
                     currency = currency,
                     accent = categoryColor,
-                    confirmEnabled = canSave,
+                    confirmEnabled = if (hasOperator) result != null else canSave,
+                    showEquals = hasOperator,
                     onKey = { expression = CalculatorInput.append(expression, it) },
                     onBackspace = { expression = CalculatorInput.backspace(expression) },
                     onCurrencyClick = {
@@ -258,7 +261,9 @@ fun AddExpenseSheet(
                     onDateClick = { datePickerOpen = true },
                     onConfirm = {
                         val id = accountId
-                        if (result != null && id != null) onSave(result, currency, id, selectedCategory.id, note, date, rateOverride)
+                        if (hasOperator) {
+                            result?.let { expression = it.toExpression() }
+                        } else if (result != null && id != null) onSave(result, currency, id, selectedCategory.id, note, date, rateOverride)
                     },
                 )
 

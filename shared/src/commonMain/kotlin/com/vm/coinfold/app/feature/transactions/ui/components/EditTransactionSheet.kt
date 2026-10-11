@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -41,6 +42,7 @@ import coinfold.shared.generated.resources.field_note
 import coinfold.shared.generated.resources.filter_category
 import coinfold.shared.generated.resources.transaction_edit_title
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.expenses.domain.models.Category
 import com.vm.coinfold.app.feature.transactions.domain.models.TransactionItem
@@ -113,9 +115,15 @@ fun EditTransactionSheet(
     var selectedSource by remember { mutableStateOf(item.source ?: IncomeSource.Preset.OTHER) }
     var customText by remember { mutableStateOf("") }
     // Exchange rate of this one transaction; only shown when the currency differs from the account.
-    var rateText by remember {
-        mutableStateOf(if (item.amount.currency != item.accountCurrency) item.rate.toPlainString() else "")
+    val initialRateText = remember(item) {
+        // The stored rate can have more decimals than the rate field accepts, which would block saving.
+        if (item.amount.currency != item.accountCurrency) {
+            item.rate.roundToDigitPositionAfterDecimalPoint(6, RoundingMode.ROUND_HALF_AWAY_FROM_ZERO).toPlainString()
+        } else {
+            ""
+        }
     }
+    var rateText by remember { mutableStateOf(initialRateText) }
 
     val accountCurrency = accountOptions.first { it.id == accountId }.currency
     val shownCurrency = if (isCategorized) currency else accountCurrency
@@ -130,7 +138,8 @@ fun EditTransactionSheet(
             Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
-                .navigationBarsPadding(),
+                .navigationBarsPadding()
+                .imePadding(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(stringResource(Res.string.transaction_edit_title), style = MaterialTheme.typography.titleLarge)
@@ -169,7 +178,8 @@ fun EditTransactionSheet(
                                 if (isIncome) resolveSource(selectedSource, customText) else null,
                                 note,
                                 date,
-                                rateValue,
+                                // An untouched rate keeps the exact stored value instead of the rounded one.
+                                rateValue.takeIf { rateText != initialRateText },
                             )
                         }
                     },

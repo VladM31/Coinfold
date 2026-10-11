@@ -145,8 +145,13 @@ private fun AccountDialogs(state: AccountsState, onIntent: (AccountsIntent) -> U
         is AccountsDialog.Operation -> AccountOperationSheet(
             item = dialog.item,
             customSources = state.customSources,
+            otherAccounts = state.accounts.filter { it.account.id != dialog.item.account.id },
+            rates = state.rates,
             onSave = { type, amount, source, note, date ->
                 onIntent(AccountsIntent.SaveOperation(type, amount, source, note, date))
+            },
+            onTransfer = { toId, amount, note, date ->
+                onIntent(AccountsIntent.SaveTransfer(toId, amount, note, date))
             },
             onDismiss = dismiss,
         )

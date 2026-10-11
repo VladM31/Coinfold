@@ -31,6 +31,8 @@
     <string name="accounts_deleted">Рахунок видалено</string>
     <string name="accounts_archived">Рахунок архівовано</string>
     <string name="accounts_top_up">Поповнити</string>
+    <string name="accounts_transfer">Переказ</string>
+    <string name="accounts_transfer_to">Переказ на</string>
     <string name="accounts_withdraw">Списати</string>
     <string name="accounts_top_up_title">Поповнення: %1$s</string>
     <string name="accounts_withdraw_title">Списання: %1$s</string>

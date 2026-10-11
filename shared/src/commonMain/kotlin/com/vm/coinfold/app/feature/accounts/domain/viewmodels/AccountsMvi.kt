@@ -3,6 +3,7 @@ package com.vm.coinfold.app.feature.accounts.domain.viewmodels
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.vm.coinfold.app.feature.accounts.domain.models.AccountWithBalance
 import com.vm.coinfold.app.feature.accounts.domain.models.TotalBalance
+import com.vm.coinfold.app.feature.currency.domain.models.RateTable
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.IncomeSource
 import com.vm.coinfold.app.shared.domain.models.TransactionType
@@ -16,6 +17,7 @@ data class AccountsState(
     val mainCurrency: Currency = Currency.UAH,
     /** Custom income sources entered earlier, offered as suggestions. */
     val customSources: List<String> = emptyList(),
+    val rates: RateTable = RateTable.Empty,
     val dialog: AccountsDialog? = null,
 )
 
@@ -55,6 +57,14 @@ sealed interface AccountsIntent {
         val type: TransactionType,
         val amount: BigDecimal,
         val source: IncomeSource?,
+        val note: String,
+        val date: LocalDate,
+    ) : AccountsIntent
+
+    /** Moves [amount] (in the currency of the opened account) to [toAccountId], converting if the currencies differ. */
+    data class SaveTransfer(
+        val toAccountId: Long,
+        val amount: BigDecimal,
         val note: String,
         val date: LocalDate,
     ) : AccountsIntent
