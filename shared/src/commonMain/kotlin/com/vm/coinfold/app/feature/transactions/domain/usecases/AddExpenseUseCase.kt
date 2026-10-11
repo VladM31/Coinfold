@@ -5,6 +5,8 @@ import com.vm.coinfold.app.feature.currency.domain.models.Conversion
 import com.vm.coinfold.app.feature.currency.domain.usecases.ConvertMoneyUseCase
 import com.vm.coinfold.app.feature.transactions.domain.models.AddExpenseResult
 import com.vm.coinfold.app.feature.transactions.domain.repositories.TransactionRepository
+import com.vm.coinfold.app.shared.analytics.Analytics
+import com.vm.coinfold.app.shared.analytics.AnalyticsEvent
 import com.vm.coinfold.app.shared.domain.models.Currency
 import com.vm.coinfold.app.shared.domain.models.Money
 
@@ -35,6 +37,11 @@ class AddExpenseUseCase(
         // A tiny amount may round to zero in the account currency; never store a zero debit.
         val accountAmount = conversion.money.takeIf { it.minorUnits > 0 } ?: Money(1, accountCurrency)
         repository.addExpense(accountId, categoryId, amount, accountAmount, conversion.rate, note, dateTime)
+        Analytics.event(
+            AnalyticsEvent.EXPENSE_ADDED,
+            "cross_currency" to (amount.currency != accountCurrency).toString(),
+            "custom_rate" to (rateOverride != null).toString(),
+        )
         return AddExpenseResult.SUCCESS
     }
 }

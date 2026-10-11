@@ -1,6 +1,8 @@
 package com.vm.coinfold.app.feature.recurring.domain.viewmodels
 
 import androidx.lifecycle.ViewModel
+import com.vm.coinfold.app.shared.analytics.Analytics
+import com.vm.coinfold.app.shared.analytics.AnalyticsEvent
 import androidx.lifecycle.viewModelScope
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.recurring_deleted
@@ -87,6 +89,12 @@ class RecurringViewModel(
                     firstDate = intent.firstDate,
                     isActive = intent.isActive,
                 ),
+            )
+            Analytics.event(
+                AnalyticsEvent.RECURRING_SAVED,
+                "frequency" to intent.frequency.name.lowercase(),
+                "type" to intent.type.name.lowercase(),
+                "is_new" to (intent.id == null).toString(),
             )
             dialog.value = null
             // A schedule that starts today or in the past should create its transactions right away.

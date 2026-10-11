@@ -47,6 +47,7 @@ import com.vm.coinfold.app.feature.settings.domain.models.ThemeMode
 import com.vm.coinfold.app.feature.settings.domain.repositories.SettingsRepository
 import com.vm.coinfold.app.feature.settings.ui.screens.SettingsScreen
 import com.vm.coinfold.app.feature.transactions.ui.screens.TransactionsScreen
+import com.vm.coinfold.app.shared.analytics.Analytics
 import com.vm.coinfold.app.shared.domain.models.ResolvedLanguage
 import com.vm.coinfold.app.shared.launch.LaunchAction
 import com.vm.coinfold.app.shared.launch.LaunchActions
@@ -155,6 +156,10 @@ fun App() {
 private fun AppScaffold(navController: androidx.navigation.NavHostController) {
     val backStack by navController.currentBackStackEntryAsState()
     val current = backStack?.destination?.route?.let { if (it == RECURRING_ROUTE || it == BACKUP_ROUTE) Route.Settings.path else it }
+
+    // One screen_view per destination (Settings sub-screens report themselves).
+    val screenName = backStack?.destination?.route
+    LaunchedEffect(screenName) { screenName?.let { Analytics.screen(it) } }
 
     Scaffold(
         bottomBar = {

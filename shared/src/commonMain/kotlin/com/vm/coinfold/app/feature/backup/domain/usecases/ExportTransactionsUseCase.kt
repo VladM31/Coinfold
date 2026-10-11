@@ -18,6 +18,8 @@ import coinfold.shared.generated.resources.report_range_previous
 import coinfold.shared.generated.resources.report_title
 import coinfold.shared.generated.resources.transaction_manual_withdrawal
 import com.vm.coinfold.app.feature.backup.domain.models.ExportFile
+import com.vm.coinfold.app.shared.analytics.Analytics
+import com.vm.coinfold.app.shared.analytics.AnalyticsEvent
 import com.vm.coinfold.app.feature.backup.domain.models.ExportRange
 import com.vm.coinfold.app.feature.backup.domain.models.ReportColumn
 import com.vm.coinfold.app.feature.backup.domain.models.ReportDocument
@@ -49,12 +51,14 @@ class ExportTransactionsUseCase(
     private val currencies: CurrencyRepository,
 ) {
     suspend fun csv(range: ExportRange): ExportFile {
+        Analytics.event(AnalyticsEvent.EXPORT_CSV, "range" to range.name.lowercase())
         val items = load(range)
         val text = exportCsv(items, TimeZone.currentSystemDefault())
         return ExportFile("coinfold-transactions-${today()}.csv", "text/csv", text.encodeToByteArray())
     }
 
     suspend fun pdf(range: ExportRange): ExportFile {
+        Analytics.event(AnalyticsEvent.EXPORT_PDF, "range" to range.name.lowercase())
         val items = load(range)
         val document = buildReport(items, range)
         return ExportFile("coinfold-report-${today()}.pdf", "application/pdf", PdfRenderer.render(document))
