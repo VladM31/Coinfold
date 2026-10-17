@@ -14,7 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
+import com.vm.coinfold.app.shared.platform.rememberWebPageOpener
 import androidx.compose.ui.unit.dp
 import coinfold.shared.generated.resources.Res
 import coinfold.shared.generated.resources.language_en
@@ -45,7 +45,7 @@ fun PolicyGateScreen(
     language: AppLanguage,
     onLanguageSelected: (AppLanguage) -> Unit,
 ) {
-    val uriHandler = LocalUriHandler.current
+    val openPage = rememberWebPageOpener()
     Surface(Modifier.fillMaxSize()) {
         Column(
             Modifier.fillMaxSize().safeDrawingPadding().padding(24.dp),
@@ -97,7 +97,7 @@ fun PolicyGateScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                    GateButton(stringResource(Res.string.policy_read), { uriHandler.openUri(policy.url) })
+                    GateButton(stringResource(Res.string.policy_read), { openPage(policy.url) })
                     GateButton(stringResource(Res.string.policy_accept), onAccept, primary = true)
                     onDecline?.let { GateButton(stringResource(Res.string.policy_decline), it) }
                 }

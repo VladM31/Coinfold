@@ -47,7 +47,7 @@ import coinfold.shared.generated.resources.settings_title
 import coinfold.shared.generated.resources.settings_version
 import coinfold.shared.generated.resources.settings_policy
 import coinfold.shared.generated.resources.settings_policy_hint
-import androidx.compose.ui.platform.LocalUriHandler
+import com.vm.coinfold.app.shared.platform.rememberWebPageOpener
 import com.vm.coinfold.app.config.AppVersionQualifier
 import com.vm.coinfold.app.feature.appconfig.domain.repositories.AppConfigRepository
 import com.vm.coinfold.app.feature.policy.fallbackPolicyUrl
@@ -231,7 +231,7 @@ private fun SettingsContent(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             // The link comes from the remote settings; without them the copy on GitHub is opened.
-            val uriHandler = LocalUriHandler.current
+            val openPage = rememberWebPageOpener()
             val languageCode = if (LocalAppLanguage.current == ResolvedLanguage.UK) "uk" else "en"
             val appConfig = koinInject<AppConfigRepository>()
             SettingsSection(
@@ -239,7 +239,7 @@ private fun SettingsContent(
                 hint = stringResource(Res.string.settings_policy_hint),
             ) {
                 OutlinedButton(onClick = {
-                    uriHandler.openUri(appConfig.config.value?.policyFor(languageCode)?.url ?: fallbackPolicyUrl(languageCode))
+                    openPage(appConfig.config.value?.policyFor(languageCode)?.url ?: fallbackPolicyUrl(languageCode))
                 }) { Text(stringResource(Res.string.settings_recurring_open)) }
             }
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
