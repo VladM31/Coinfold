@@ -207,6 +207,10 @@
     <string name="policy_decline">Відмовитись і закрити</string>
     <string name="policy_offline">Не вдалося завантажити політику конфіденційності. Перевірте інтернет і спробуйте ще раз.</string>
     <string name="policy_retry">Спробувати ще раз</string>
+    <string name="update_title">Потрібне оновлення</string>
+    <string name="update_message">Ця версія Coinfold більше не підтримується. Оновіть застосунок, щоб продовжити.</string>
+    <string name="update_button">Оновити</string>
+    <string name="update_close">Закрити</string>
     <string name="settings_policy">Політика конфіденційності</string>
     <string name="settings_policy_hint">Як застосунок поводиться з вашими даними</string>
     <string name="settings_version">Версія %1$s</string>

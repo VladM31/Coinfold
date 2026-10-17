@@ -3,16 +3,14 @@ package com.vm.coinfold.app.feature.policy.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material3.Button
+import androidx.compose.ui.text.style.TextAlign
+import com.vm.coinfold.app.feature.policy.ui.components.GateButton
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,10 +74,15 @@ fun PolicyGateScreen(
                         stringResource(Res.string.policy_offline),
                         modifier = Modifier.padding(vertical = 16.dp),
                         style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
                     )
-                    Button(onClick = onRetry) { Text(stringResource(Res.string.policy_retry)) }
-                    onDecline?.let {
-                        TextButton(onClick = it) { Text(stringResource(Res.string.policy_decline)) }
+                    Column(
+                Modifier.padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                        GateButton(stringResource(Res.string.policy_retry), onRetry, primary = true)
+                        onDecline?.let { GateButton(stringResource(Res.string.policy_decline), it) }
                     }
                 }
             } else {
@@ -87,18 +90,16 @@ fun PolicyGateScreen(
                     stringResource(Res.string.policy_message),
                     modifier = Modifier.padding(vertical = 16.dp),
                     style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
                 )
-                OutlinedButton(onClick = { uriHandler.openUri(policy.url) }, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(Res.string.policy_read))
-                }
-                Button(
-                    onClick = onAccept,
-                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-                ) { Text(stringResource(Res.string.policy_accept)) }
-                onDecline?.let {
-                    TextButton(onClick = it, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(Res.string.policy_decline))
-                    }
+                Column(
+                Modifier.padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                    GateButton(stringResource(Res.string.policy_read), { uriHandler.openUri(policy.url) })
+                    GateButton(stringResource(Res.string.policy_accept), onAccept, primary = true)
+                    onDecline?.let { GateButton(stringResource(Res.string.policy_decline), it) }
                 }
             }
         }

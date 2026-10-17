@@ -19,6 +19,9 @@ enum class PolicyStatus {
     /** The current policy is accepted (or there is nothing to accept), the app can be used. */
     ALLOWED,
 
+    /** This app version is no longer supported; the user has to update ([PolicyState.updateUrl]). */
+    UPDATE_REQUIRED,
+
     /** The user has to accept [PolicyState.policy] first. */
     REQUIRED,
 }
@@ -28,6 +31,8 @@ data class PolicyState(
     /** The policy to accept; null while it is not loaded yet (first launch without internet). */
     val policy: PolicyLink? = null,
     val isLoading: Boolean = false,
+    /** Where to get the update (the store page); null until the app is published. */
+    val updateUrl: String? = null,
 )
 
 /**
@@ -37,6 +42,7 @@ data class PolicyState(
 class PolicyViewModel(
     private val storage: PolicyStorage,
     private val appConfig: AppConfigRepository,
+    private val appVersion: String,
 ) : ViewModel() {
 
     private val language = MutableStateFlow("en")
@@ -48,6 +54,9 @@ class PolicyViewModel(
     val state: StateFlow<PolicyState> = combine(accepted, appConfig.config, language, isLoading) { accepted, config, lang, loading ->
         when {
             accepted == null -> PolicyState()
+            // an empty list would lock everybody out, so it means "no restriction"
+            config != null && config.supportedVersions.isNotEmpty() && !config.isSupported(appVersion) ->
+                PolicyState(PolicyStatus.UPDATE_REQUIRED, updateUrl = config.updateUrl)
             else -> {
                 val policy = config?.policyFor(lang)
                 when {

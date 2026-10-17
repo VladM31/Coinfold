@@ -65,6 +65,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import com.vm.coinfold.app.feature.policy.domain.viewmodels.PolicyStatus
 import com.vm.coinfold.app.feature.policy.domain.viewmodels.PolicyViewModel
 import com.vm.coinfold.app.feature.policy.ui.screens.PolicyGateScreen
+import com.vm.coinfold.app.feature.policy.ui.screens.UpdateRequiredScreen
 import com.vm.coinfold.app.shared.platform.rememberAppExit
 
 @Composable
@@ -161,6 +162,7 @@ fun App() {
                 when (policy.status) {
                     PolicyStatus.CHECKING -> Unit
                     PolicyStatus.ALLOWED -> key(localeTag) { AppScaffold(navController) }
+                    PolicyStatus.UPDATE_REQUIRED -> UpdateRequiredScreen(policy.updateUrl, onClose = exitApp)
                     PolicyStatus.REQUIRED -> PolicyGateScreen(
                         state = policy,
                         onAccept = policyViewModel::accept,
