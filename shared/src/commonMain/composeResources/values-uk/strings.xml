@@ -200,6 +200,15 @@
     <string name="rate_use_bank">Курс банку</string>
 
     <!-- Backup and export -->
+    <string name="policy_title">Політика конфіденційності</string>
+    <string name="policy_message">Щоб користуватися Coinfold, прочитайте та прийміть політику конфіденційності. Ваші фінансові дані залишаються на пристрої.</string>
+    <string name="policy_read">Прочитати політику</string>
+    <string name="policy_accept">Прийняти</string>
+    <string name="policy_decline">Відмовитись і закрити</string>
+    <string name="policy_offline">Не вдалося завантажити політику конфіденційності. Перевірте інтернет і спробуйте ще раз.</string>
+    <string name="policy_retry">Спробувати ще раз</string>
+    <string name="settings_policy">Політика конфіденційності</string>
+    <string name="settings_policy_hint">Як застосунок поводиться з вашими даними</string>
     <string name="settings_version">Версія %1$s</string>
     <string name="settings_backup">Резервна копія та експорт</string>
     <string name="settings_backup_hint">Збережіть дані у файл, відновіть їх або експортуйте транзакції в таблицю чи PDF</string>
