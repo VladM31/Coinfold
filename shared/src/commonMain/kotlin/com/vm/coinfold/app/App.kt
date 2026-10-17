@@ -61,6 +61,11 @@ import com.vm.coinfold.app.shared.ui.theme.CoinfoldTheme
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
+import com.vm.coinfold.app.feature.policy.domain.viewmodels.PolicyStatus
+import com.vm.coinfold.app.feature.policy.domain.viewmodels.PolicyViewModel
+import com.vm.coinfold.app.feature.policy.ui.screens.PolicyGateScreen
+import com.vm.coinfold.app.shared.platform.rememberAppExit
 
 @Composable
 fun App() {
@@ -77,6 +82,10 @@ fun App() {
     val lockStatus by lock.status.collectAsState()
     val isProtected by lock.isProtected.collectAsState()
     var covered by remember { mutableStateOf(false) }
+    // Start-up gate: the app opens only after the current privacy policy is accepted.
+    val policyViewModel = koinViewModel<PolicyViewModel>()
+    val policy by policyViewModel.state.collectAsState()
+    val exitApp = rememberAppExit()
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
         lock.onBackground()
         // numbers on the home screen widget should match what the user just saw
@@ -86,13 +95,15 @@ fun App() {
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { covered = false }
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         lock.onForeground()
+        policyViewModel.refresh()
         scope.launch { processRecurring() }
     }
     // Hide the content in the recent-apps list (and from screenshots) while a PIN protects the app.
     SecureWindowEffect(enabled = isProtected)
 
     // Wait for the stored settings so the app does not flash the default theme/language.
-    val settings = koinInject<SettingsRepository>().settings.collectAsState(initial = null).value ?: return
+    val settingsRepository = koinInject<SettingsRepository>()
+    val settings = settingsRepository.settings.collectAsState(initial = null).value ?: return
     // Also wait for the lock decision, so a protected app never shows its content for a moment.
     if (lockStatus == LockStatus.LOADING) return
 
@@ -111,6 +122,10 @@ fun App() {
     val resolvedLanguage = when (localeTag ?: LocalAppLocale.systemTag.take(2)) {
         "uk" -> ResolvedLanguage.UK
         else -> ResolvedLanguage.EN
+    }
+
+    LaunchedEffect(resolvedLanguage) {
+        policyViewModel.setLanguage(if (resolvedLanguage == ResolvedLanguage.UK) "uk" else "en")
     }
 
     // Runs after the locale is applied, so the names match the language the user sees.
@@ -143,7 +158,18 @@ fun App() {
                 }
             }
             Box(Modifier.fillMaxSize()) {
-                key(localeTag) { AppScaffold(navController) }
+                when (policy.status) {
+                    PolicyStatus.CHECKING -> Unit
+                    PolicyStatus.ALLOWED -> key(localeTag) { AppScaffold(navController) }
+                    PolicyStatus.REQUIRED -> PolicyGateScreen(
+                        state = policy,
+                        onAccept = policyViewModel::accept,
+                        onDecline = exitApp,
+                        onRetry = policyViewModel::refresh,
+                        language = settings.language,
+                        onLanguageSelected = { scope.launch { settingsRepository.setLanguage(it) } },
+                    )
+                }
                 // The lock screen is drawn over the app, so the screen the user was on is still there afterwards.
                 if (lockStatus == LockStatus.LOCKED) LockScreen()
                 if (covered && isProtected) PrivacyCover()
