@@ -8,6 +8,15 @@ plugins {
     alias(libs.plugins.firebaseCrashlytics)
 }
 
+// The only place to change the version. Keep it equal to MARKETING_VERSION in iosApp/Configuration/Config.xcconfig
+// and to the entries of "supportedVersions" / "currentVersion" in the remote config (the gist).
+val appVersion = "1.0.0"
+
+// 1.2.3 -> 10203: grows with every release, as Google Play requires (each part must stay below 100).
+val appVersionCode = appVersion.split(".").map { it.toInt() }.let { (major, minor, patch) ->
+    major * 10_000 + minor * 100 + patch
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_11
@@ -36,8 +45,8 @@ android {
         applicationId = "com.vm.coinfold.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = appVersionCode
+        versionName = appVersion
     }
     packaging {
         resources {
@@ -46,7 +55,8 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
