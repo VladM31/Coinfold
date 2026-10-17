@@ -200,6 +200,7 @@
     <string name="rate_use_bank">Use bank rate</string>
 
     <!-- Backup and export -->
+    <string name="settings_version">Version %1$s</string>
     <string name="settings_backup">Backup and export</string>
     <string name="settings_backup_hint">Save your data to a file, restore it, or export transactions to a spreadsheet or PDF</string>
     <string name="backup_title">Backup and export</string>

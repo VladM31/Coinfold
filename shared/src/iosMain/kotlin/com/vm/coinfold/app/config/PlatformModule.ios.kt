@@ -8,6 +8,7 @@ import io.ktor.client.engine.darwin.Darwin
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import platform.Foundation.NSBundle
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
@@ -28,6 +29,9 @@ actual val platformModule: Module = module {
     single<HttpClientEngine> { Darwin.create() }
     single<RoomDatabase.Builder<AppDatabase>> {
         Room.databaseBuilder<AppDatabase>(name = documentsPath() + "/" + DATABASE_FILE_NAME)
+    }
+    single<String>(AppVersionQualifier) {
+        NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: "none"
     }
     single<String>(DataStorePathQualifier) { documentsPath() + "/" + DATASTORE_FILE_NAME }
 }

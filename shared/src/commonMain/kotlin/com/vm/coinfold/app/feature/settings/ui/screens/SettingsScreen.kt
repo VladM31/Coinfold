@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -20,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coinfold.shared.generated.resources.Res
@@ -42,6 +44,8 @@ import coinfold.shared.generated.resources.settings_recurring_hint
 import coinfold.shared.generated.resources.settings_recurring_open
 import coinfold.shared.generated.resources.settings_theme
 import coinfold.shared.generated.resources.settings_title
+import coinfold.shared.generated.resources.settings_version
+import com.vm.coinfold.app.config.AppVersionQualifier
 import coinfold.shared.generated.resources.theme_dark
 import coinfold.shared.generated.resources.theme_light
 import coinfold.shared.generated.resources.theme_system
@@ -65,6 +69,7 @@ import com.vm.coinfold.app.shared.ui.components.CurrencySelector
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -216,6 +221,15 @@ private fun SettingsContent(
                     onRefresh = { onIntent(SettingsIntent.RefreshRatesClicked) },
                 )
             }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Text(
+                stringResource(Res.string.settings_version, koinInject<String>(AppVersionQualifier)),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
     security.dialog?.let { dialog ->

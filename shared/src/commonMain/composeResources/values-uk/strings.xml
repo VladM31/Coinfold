@@ -200,6 +200,7 @@
     <string name="rate_use_bank">Курс банку</string>
 
     <!-- Backup and export -->
+    <string name="settings_version">Версія %1$s</string>
     <string name="settings_backup">Резервна копія та експорт</string>
     <string name="settings_backup_hint">Збережіть дані у файл, відновіть їх або експортуйте транзакції в таблицю чи PDF</string>
     <string name="backup_title">Резервна копія та експорт</string>

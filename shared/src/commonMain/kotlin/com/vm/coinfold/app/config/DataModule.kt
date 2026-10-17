@@ -22,6 +22,9 @@ const val DATASTORE_FILE_NAME = "coinfold.preferences_pb"
 const val DATABASE_FILE_NAME = "coinfold.db"
 val DataStorePathQualifier = named("datastore_path")
 
+/** Version name of the app (for example "1.0"), provided by each platform. */
+val AppVersionQualifier = named("app_version")
+
 val dataModule = module {
     single<AppDatabase> {
         get<RoomDatabase.Builder<AppDatabase>>()

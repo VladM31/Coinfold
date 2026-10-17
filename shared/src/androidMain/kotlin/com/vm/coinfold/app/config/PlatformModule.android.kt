@@ -19,6 +19,10 @@ actual val platformModule: Module = module {
             name = context.getDatabasePath(DATABASE_FILE_NAME).absolutePath,
         )
     }
+    single<String>(AppVersionQualifier) {
+        val context = get<Context>()
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
+    }
     single<String>(DataStorePathQualifier) {
         get<Context>().filesDir.resolve(DATASTORE_FILE_NAME).absolutePath
     }
