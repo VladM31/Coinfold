@@ -7,6 +7,9 @@ interface AnalyticsTracker {
 
     /** A handled error that is worth seeing next to the crashes. */
     fun recordError(error: Throwable)
+
+    /** Turns reporting on or off. It stays off until the user has accepted the privacy policy. */
+    fun setCollectionEnabled(enabled: Boolean)
 }
 
 /** Does nothing: the default until a platform installs a real tracker (and on platforms without one). */
@@ -14,6 +17,7 @@ private object NoopTracker : AnalyticsTracker {
     override fun logEvent(name: String, params: Map<String, String>) = Unit
     override fun logScreen(name: String) = Unit
     override fun recordError(error: Throwable) = Unit
+    override fun setCollectionEnabled(enabled: Boolean) = Unit
 }
 
 /** Entry point for the shared code; reporting must never be able to break the app. */
@@ -30,6 +34,10 @@ object Analytics {
 
     fun screen(name: String) {
         runCatching { tracker.logScreen(name) }
+    }
+
+    fun setCollectionEnabled(enabled: Boolean) {
+        runCatching { tracker.setCollectionEnabled(enabled) }
     }
 
     fun error(error: Throwable) {

@@ -7,16 +7,21 @@ import Shared
 /// so testing does not pollute the numbers. Never pass amounts, notes or names.
 final class FirebaseTracker: Shared.AnalyticsTracker {
 
+    /// Collection is off in Info.plist and is turned on by the shared code only after the user
+    /// accepted the privacy policy.
     static func install() {
         FirebaseApp.configure()
-        #if DEBUG
-        let enabled = false
-        #else
-        let enabled = true
-        #endif
-        FirebaseAnalytics.Analytics.setAnalyticsCollectionEnabled(enabled)
-        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(enabled)
         Shared.Analytics.shared.install(tracker: FirebaseTracker())
+    }
+
+    func setCollectionEnabled(enabled: Bool) {
+        #if DEBUG
+        let allowed = false
+        #else
+        let allowed = enabled
+        #endif
+        FirebaseAnalytics.Analytics.setAnalyticsCollectionEnabled(allowed)
+        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(allowed)
     }
 
     func logEvent(name: String, params: [String: String]) {

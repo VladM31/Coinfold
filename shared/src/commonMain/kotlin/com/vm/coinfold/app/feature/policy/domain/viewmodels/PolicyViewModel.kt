@@ -8,7 +8,9 @@ import com.vm.coinfold.app.feature.policy.db.storages.PolicyStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import com.vm.coinfold.app.shared.analytics.Analytics
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -71,6 +73,15 @@ class PolicyViewModel(
             }
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, PolicyState())
+
+    init {
+        // Analytics and crash reports are allowed only while the current policy is accepted.
+        viewModelScope.launch {
+            combine(state, accepted) { state, accepted ->
+                state.status == PolicyStatus.ALLOWED && accepted != null && accepted != PolicyStorage.NONE
+            }.distinctUntilChanged().collect { Analytics.setCollectionEnabled(it) }
+        }
+    }
 
     fun setLanguage(code: String) {
         language.value = code

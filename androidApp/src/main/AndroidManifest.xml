@@ -36,6 +36,14 @@
                     android:resource="@xml/shortcuts"/>
         </activity>
 
+        <!-- Firebase reports nothing until the user accepts the privacy policy (see FirebaseTracker) -->
+        <meta-data
+                android:name="firebase_analytics_collection_enabled"
+                android:value="false"/>
+        <meta-data
+                android:name="firebase_crashlytics_collection_enabled"
+                android:value="false"/>
+
         <!-- Home screen widget: what is left this period and a button to add an expense -->
         <receiver
                 android:name=".QuickAddWidgetProvider"
