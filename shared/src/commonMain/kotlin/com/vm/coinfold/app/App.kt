@@ -2,6 +2,17 @@ package com.vm.coinfold.app
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +77,7 @@ import com.vm.coinfold.app.feature.policy.domain.viewmodels.PolicyStatus
 import com.vm.coinfold.app.feature.policy.domain.viewmodels.PolicyViewModel
 import com.vm.coinfold.app.feature.policy.ui.screens.PolicyGateScreen
 import com.vm.coinfold.app.feature.policy.ui.screens.UpdateRequiredScreen
+import com.vm.coinfold.app.shared.platform.SystemBarsEffect
 import com.vm.coinfold.app.shared.platform.rememberAppExit
 
 @Composable
@@ -113,6 +125,8 @@ fun App() {
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
     }
+
+    SystemBarsEffect(darkTheme)
 
     // null tag = follow the device language (resources fall back to English for unsupported ones).
     val localeTag = when (settings.language) {
@@ -180,6 +194,11 @@ fun App() {
     }
 }
 
+
+/** From this width (dp) the bottom bar becomes a side rail and the content stops stretching. */
+private val WideLayoutMinWidth = 600.dp
+private val ContentMaxWidth = 600.dp
+
 @Composable
 private fun AppScaffold(navController: androidx.navigation.NavHostController) {
     val backStack by navController.currentBackStackEntryAsState()
@@ -189,58 +208,85 @@ private fun AppScaffold(navController: androidx.navigation.NavHostController) {
     val screenName = backStack?.destination?.route
     LaunchedEffect(screenName) { screenName?.let { Analytics.screen(it) } }
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar {
-                Route.entries.forEach { route ->
-                    NavigationBarItem(
-                        selected = current == route.path,
-                        onClick = {
-                            navController.navigate(route.path) {
-                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = {
-                            NavIcon(
-                                kind = route.icon,
-                                tint = if (current == route.path) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onSurfaceVariant,
+    val navigate: (Route) -> Unit = { route ->
+        navController.navigate(route.path) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+    val icon: @Composable (Route) -> Unit = { route ->
+        NavIcon(
+            kind = route.icon,
+            tint = if (current == route.path) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        // Tablets and landscape: navigation on the side and a readable column in the middle.
+        val wide = maxWidth >= WideLayoutMinWidth
+        Scaffold(
+            bottomBar = {
+                if (!wide) {
+                    NavigationBar {
+                        Route.entries.forEach { route ->
+                            NavigationBarItem(
+                                selected = current == route.path,
+                                onClick = { navigate(route) },
+                                icon = { icon(route) },
+                                label = { Text(stringResource(route.label), maxLines = 1, softWrap = false) },
                             )
-                        },
-                        label = { Text(stringResource(route.label), maxLines = 1, softWrap = false) },
-                    )
+                        }
+                    }
                 }
-            }
-        },
-    ) { padding ->
-        NavHost(navController, startDestination = Route.Expenses.path, modifier = Modifier.padding(padding)) {
-            Route.entries.forEach { route ->
-                composable(route.path) {
-                    when (route) {
-                        Route.Accounts -> AccountsScreen()
-                        Route.Expenses -> ExpensesScreen()
-                        Route.Overview -> OverviewScreen(
-                            onOpenTransactions = { filter ->
-                                TransactionFilterRequests.post(filter)
-                                navController.navigate(Route.Transactions.path) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
+            },
+        ) { padding ->
+            Row(Modifier.padding(padding).fillMaxSize()) {
+                if (wide) {
+                    NavigationRail(windowInsets = WindowInsets(0)) {
+                        Spacer(Modifier.weight(1f))
+                        Route.entries.forEach { route ->
+                            NavigationRailItem(
+                                selected = current == route.path,
+                                onClick = { navigate(route) },
+                                icon = { icon(route) },
+                                label = { Text(stringResource(route.label), maxLines = 1, softWrap = false) },
+                            )
+                        }
+                        Spacer(Modifier.weight(1f))
+                    }
+                }
+                Box(Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.TopCenter) {
+                    NavHost(
+                        navController,
+                        startDestination = Route.Expenses.path,
+                        modifier = Modifier.fillMaxHeight().widthIn(max = ContentMaxWidth).fillMaxWidth(),
+                    ) {
+                        Route.entries.forEach { route ->
+                            composable(route.path) {
+                                when (route) {
+                                    Route.Accounts -> AccountsScreen()
+                                    Route.Expenses -> ExpensesScreen()
+                                    Route.Overview -> OverviewScreen(
+                                        onOpenTransactions = { filter ->
+                                            TransactionFilterRequests.post(filter)
+                                            navigate(Route.Transactions)
+                                        },
+                                    )
+                                    Route.Transactions -> TransactionsScreen()
+                                    Route.Settings -> SettingsScreen(
+                                        onOpenRecurring = { navController.navigate(RECURRING_ROUTE) },
+                                        onOpenBackup = { navController.navigate(BACKUP_ROUTE) },
+                                    )
                                 }
-                            },
-                        )
-                        Route.Transactions -> TransactionsScreen()
-                        Route.Settings -> SettingsScreen(
-                            onOpenRecurring = { navController.navigate(RECURRING_ROUTE) },
-                            onOpenBackup = { navController.navigate(BACKUP_ROUTE) },
-                        )
+                            }
+                        }
+                        composable(RECURRING_ROUTE) { RecurringScreen(onBack = { navController.popBackStack() }) }
+                        composable(BACKUP_ROUTE) { BackupScreen(onBack = { navController.popBackStack() }) }
                     }
                 }
             }
-            composable(RECURRING_ROUTE) { RecurringScreen(onBack = { navController.popBackStack() }) }
-            composable(BACKUP_ROUTE) { BackupScreen(onBack = { navController.popBackStack() }) }
         }
     }
 }
