@@ -46,7 +46,7 @@ Analytics and crash reporting are disabled in development builds.
 ## 4. Your choices and rights
 
 - All of your financial data is under your control: edit or delete it in the app, or delete everything by clearing the app's storage or uninstalling it.
-- To ask about, access, or delete analytics data associated with your installation, contact us (see below). Because the identifier is random, we may ask you for the installation identifier or other details to find it.
+- To ask about, access, or delete analytics data associated with your installation, contact us (see below) or follow the step-by-step instructions in [DATA_DELETION.md](DATA_DELETION.md). Because the identifier is random, we may ask you for the installation identifier or other details to find it.
 - If you are in the EU/EEA, UK or a similar region, you have the rights granted by applicable law (access, correction, deletion, objection, complaint to a supervisory authority).
 
 ## 5. Children
